@@ -10,25 +10,15 @@ public class Mandelbrot{
 	static int iteration_color_start = 0;
 	static double limit_square = 4;
 	static double res = .5;
-	static int[][] Spectrum = {{0,0,0},{0,255,0},{200,255,200}};
+	static int[][] Spectrum = {{0,0,0},{255,0,0},{255,255,0},{0,255,0},{0,255,255},{0,0,255}};
 	static int[] set_color = {0,0,0};
 
 	//dependent parameters
 	static double y_height, x_min, x_max, y_min, y_max;
 	static int x_pixels, y_pixels;
-	/*
-	static double y_height = x_width * 9.0/16.0;
-	static double x_min = x_center - .5 * x_width;
-	static double x_max = x_center + .5 * x_width;
-	static double y_min = y_center - .5 * y_height;
-	static double y_max = y_center + .5 * y_height;
-	static int x_pixels = (int) Math.round(1920*res);
-	static int y_pixels = (int) Math.round(x_pixels*.5625);
-	*/
 		
 	public static int Converge(Complex z){
 		int i = 0;
-		//System.out.println(iteration_limit);
 		Complex w = z;
 		while(w.ModSquare()<limit_square && i< iteration_limit){
 			i++;
@@ -149,14 +139,6 @@ public class Mandelbrot{
 					
 			}
 		}
-		System.out.println("program survived parameter parsing.");
-		System.out.println("-x:\t" + x_center);
-		System.out.println("-y:\t" + y_center);
-		System.out.println("-w:\t" + x_width);
-		System.out.println("-i:\t" + iteration_limit + "   " + iteration_color_start);
-		System.out.println("-r:\t" + res);
-		System.out.println("file:\t" + name);
-		
 		
 		//Adjust program constants
 		y_height = x_width * 9.0/16.0;
