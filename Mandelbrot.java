@@ -12,6 +12,9 @@ public class Mandelbrot{
 	static double res = .5;
 	static int[][] Spectrum = {{0,0,0},{255,0,0},{255,255,0},{0,255,0},{0,255,255},{0,0,255}};
 	static int[] set_color = {0,0,0};
+	
+	static boolean julia = false;
+	static Complex julia_center = new Complex(0,0);
 
 	//dependent parameters
 	static double y_height, x_min, x_max, y_min, y_max;
@@ -26,6 +29,18 @@ public class Mandelbrot{
 		}
 		return i;
 	}
+	
+	public static int JuliaConverge(Complex z){
+		int i = 0;
+		Complex w = z;
+		while(w.ModSquare()<limit_square && i< iteration_limit){
+			i++;
+			w = w.Square().Add(julia_center);
+		}
+		return i;
+	}
+	
+	
 	public static Complex PixelsToComplex(int x, int y){
 		double re = x_min + x * x_width / (x_pixels-1);
 		double im = y_max - y * y_height / (y_pixels-1);
@@ -45,6 +60,8 @@ public class Mandelbrot{
 		-i		the iteration limit specifies the nubmer of iterations before the point is considered in the set, while the color start indicates the iteration number where the color spectrum begins
 		-r 		the resolution of the image. A resolution of 1 will give a standard 1920x1080 image
 		file	the name of the file. Defaults to "image.png" if not specified
+		-j 		specifies the c value of a julia set and generates a juila set instead. Take two floating point args:
+				real and immaginary of the c value.
 ***************************************************************/
 		String name = "image";
 		int argindex = 0;
@@ -103,6 +120,25 @@ public class Mandelbrot{
 							iteration_color_start = Integer.parseInt(args[argindex+2]);
 						}catch(NumberFormatException e){
 							System.err.println("Error: -i needs two integer arguments.");
+							return;
+						}
+					}
+					if(iteration_limit<=iteration_color_start){
+						System.err.println("Error: iteration limit must be larger than the color start.");
+						return;
+					}
+					argindex += 3;
+					break;
+				case "-j":
+					if(argindex+2>=args.length){
+						System.err.println("Error: -j flag needs two floating point values.");
+						return;
+					}else{
+						try{
+							julia_center = new Complex(Double.parseDouble(args[argindex+1]),Double.parseDouble(args[argindex+2]));
+							julia = true;
+						}catch(NumberFormatException e){
+							System.err.println("Error: -j needs two floating point arguments.");
 							return;
 						}
 					}
@@ -182,7 +218,12 @@ public class Mandelbrot{
 		for(int x=0; x<x_pixels; x++){
 			System.out.print(100*x/x_pixels + "%\r");
 			for(int y=0; y<y_pixels; y++){
-				int my_count = Converge(PixelsToComplex(x,y))-iteration_color_start;
+				int my_count;
+				if(!julia){
+					my_count = Converge(PixelsToComplex(x,y))-iteration_color_start;
+				}else{
+					my_count = JuliaConverge(PixelsToComplex(x,y))-iteration_color_start;
+				}
 				if(my_count<0){my_count = 0;}
 				img.setRGB(x,y,colors[my_count]);
 			}

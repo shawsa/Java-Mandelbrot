@@ -21,3 +21,6 @@ OPTIONS
 	-r 		the resolution of the image. A resolution of 1 will give a standard 1920x1080 image
 	
 	file	the name of the file. Defaults to "image.png" if not specified
+	
+	-j 		specifies the c value of a julia set and generates a juila set instead. Take two floating point args:
+				real and immaginary of the c value.
