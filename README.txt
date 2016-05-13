@@ -24,3 +24,7 @@ OPTIONS
 	
 	-j 		specifies the c value of a julia set and generates a juila set instead. Take two floating point args:
 				real and immaginary of the c value.
+				
+	-c 		specifies the color spectrum found in spectrums.txt. The format for colors in spectrum.txt is the 
+			spectrum name, newline, then a list of RGB tuples separated by semi-colons. The final RGB tupal is the
+			set color.

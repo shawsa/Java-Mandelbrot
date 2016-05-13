@@ -1,5 +1,5 @@
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
 import javax.imageio.ImageIO;
 public class Mandelbrot{
 	//default independent parameters
@@ -47,6 +47,41 @@ public class Mandelbrot{
 		return new Complex(re,im);
 	}
 		
+	public static void SetSpectrum(String arg) throws IllegalArgumentException,FileNotFoundException, IOException{
+		String color_file = "spectrums.txt";
+		String line = null;
+		String textArray = "";
+		FileReader fileReader = new FileReader(color_file);
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		boolean found_spectrum = false;
+		while((line = bufferedReader.readLine()) != null){
+			if(line.equals(arg)){
+				textArray = bufferedReader.readLine();
+				found_spectrum = true;
+				break;
+			}
+		}
+		if(!found_spectrum){throw new IllegalArgumentException();}
+		textArray = textArray.replaceAll("\\s","");
+		//parse text array to spectrum
+		try{
+			String colors[] = textArray.split(";");
+			//for(int i=0; i<colors.length-1; i++){System.out.println(colors[i]);}
+			Spectrum = new int[colors.length-1][3];
+			for(int i=0; i<colors.length-1; i++){
+				String[] current_color = colors[i].split(",");
+				for(int j=0; j<3; j++){
+					Spectrum[i][j] = Integer.parseInt(current_color[j]);
+					if(Spectrum[i][j]<0 || Spectrum[i][j]>255){throw new IllegalArgumentException();}
+				}
+			}
+			String[] current_color = colors[colors.length-1].split(",");
+			for(int j=0; j<3; j++){
+				set_color[j] = Integer.parseInt(current_color[j]);
+				if(set_color[j]<0 || set_color[j]>255){throw new IllegalArgumentException();}
+			}
+		}catch(Exception e){throw new IllegalArgumentException();}
+	}
 
 	public static void main(String args[]){
 			
@@ -60,8 +95,8 @@ public class Mandelbrot{
 		-i		the iteration limit specifies the nubmer of iterations before the point is considered in the set, while the color start indicates the iteration number where the color spectrum begins
 		-r 		the resolution of the image. A resolution of 1 will give a standard 1920x1080 image
 		file	the name of the file. Defaults to "image.png" if not specified
-		-j 		specifies the c value of a julia set and generates a juila set instead. Take two floating point args:
-				real and immaginary of the c value.
+		-j 		specifies the c value of a julia set and generates a juila set instead. Take two floating point args: real and immaginary of the c value.
+		-c 		specifies the color spectrum found in spectrums.txt
 ***************************************************************/
 		String name = "image";
 		int argindex = 0;
@@ -158,6 +193,23 @@ public class Mandelbrot{
 						}catch(NumberFormatException e){
 							System.err.println("Error: -r needs a floating point decimal argument.");
 							return;
+						}
+					}
+					argindex += 2;
+					break;
+				case "-c":
+					if(argindex+1>=args.length){
+						System.err.println("Error: -c flag needs string value.");
+						return;
+					}else{
+						try{
+							SetSpectrum(args[argindex+1]);
+						}catch(IllegalArgumentException e){
+							System.err.println("Error: the color parameter cannot be found in the list of spectrums, or the spectrum text is improperly formatted.");
+						}catch(FileNotFoundException e){
+							System.err.println("Error: the file spectrums.txt was not found.");
+						}catch(IOException e){
+							System.err.println("Error: there was an unexpected error reading from the file spectrums.txt");
 						}
 					}
 					argindex += 2;
