@@ -85,6 +85,9 @@ public class Mandelbrot{
 		y_height = x_width / aspect;
 		recalculateWindow();
 	}
+	public void setJulia(double x, double y){
+		julia_center = new Complex(x,y);
+	}	
 		
 	public void SetSpectrum(String arg) throws IllegalArgumentException,FileNotFoundException, IOException{
 		String color_file = "spectrums.txt";
@@ -282,7 +285,7 @@ public class Mandelbrot{
 						return;
 					}else{
 						try{
-							mandelbrot.julia_center = new Complex(Double.parseDouble(args[argindex+1]),Double.parseDouble(args[argindex+2]));
+							mandelbrot.setJulia(Double.parseDouble(args[argindex+1]),Double.parseDouble(args[argindex+2]));
 							mandelbrot.julia = true;
 						}catch(NumberFormatException e){
 							System.err.println("Error: -j needs two floating point arguments.");
