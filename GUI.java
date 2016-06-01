@@ -4,17 +4,16 @@ import javax.imageio.ImageIO;
 
 import javafx.application.Application;
 
+import javafx.embed.swing.SwingFXUtils;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.*;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.paint.Color;
 
 import javafx.stage.Stage;
@@ -25,8 +24,12 @@ import javafx.geometry.Insets;
 
 public class GUI extends Application{
 	public static Mandelbrot mandelbrot;
+	public static ImageView imageView;
+	//public static WritableImage img;
 	public static void main(String[] args){
 		mandelbrot = new Mandelbrot();
+		imageView = new ImageView();
+		imageView.setImage(mandelbrot.generateImage());
 		launch(args);
 	}
 	
@@ -34,6 +37,10 @@ public class GUI extends Application{
 	public void start(Stage primaryStage){
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
 		GridPane grid = new GridPane();
+		for (int i = 0; i<3; i++) {
+			ColumnConstraints column = new ColumnConstraints(50);
+			grid.getColumnConstraints().add(column);
+		 }
 		grid.setAlignment(Pos.TOP_LEFT);
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -148,13 +155,24 @@ public class GUI extends Application{
 		
 		//Generate Button
 		Button btnGenerate = new Button("Generate");
-		grid.add(btnGenerate,1,row);
+		grid.add(btnGenerate,0,row,3,1);
 		row++;
+		
+		//Save Button
+		Button btnSave = new Button("Save");
+		grid.add(btnSave,0,row,3,1);
+		row++;
+		
 		
 		//Error text
 		Text lblError = new Text();
 		grid.add(lblError,0,row,3,1);
 		lblError.setFill(Color.FIREBRICK);
+		
+		//Image View
+		
+		VBox imgBox = new VBox(1,imageView);
+		grid.add(imgBox,4,0,1,row);
 		
 		//Listeners
 		//Generate Button Listener
@@ -224,6 +242,9 @@ public class GUI extends Application{
 				if(cbAspect.isSelected()){
 					mandelbrot.setWidth(width);
 					txtHeight.setText(String.valueOf(mandelbrot.y_height));
+					System.out.println(mandelbrot.y_pixels);
+					System.out.println(y_pixels);
+					System.out.println("Test");
 					txtYpixels.setText(String.valueOf(mandelbrot.y_pixels));
 				}else{
 					mandelbrot.setWidthHeight(width,height);
@@ -234,7 +255,22 @@ public class GUI extends Application{
 				lblYmaxVal.setText(String.valueOf(mandelbrot.y_max));
 				
 				//generate image
-				BufferedImage img = mandelbrot.generateImage();
+				//BufferedImage img = mandelbrot.generateImage();
+				imageView.setImage(mandelbrot.generateImage());
+				
+				/*File f = new File("image.png");
+				try{
+					ImageIO.write(img, "PNG", f);
+				}catch(Exception e){
+					System.out.println("Failed to write file.");
+				}*/
+			}
+		});
+		
+		btnSave.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent event){
+				BufferedImage img = SwingFXUtils.fromFXImage(imageView.getImage(), null);
 				File f = new File("image.png");
 				try{
 					ImageIO.write(img, "PNG", f);
