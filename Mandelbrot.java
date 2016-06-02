@@ -89,7 +89,7 @@ public class Mandelbrot{
 		julia_center = new Complex(x,y);
 	}	
 		
-	public void SetSpectrum(String arg) throws IllegalArgumentException,FileNotFoundException, IOException{
+	public void setSpectrum(String arg) throws IllegalArgumentException,FileNotFoundException, IOException{
 		String color_file = "spectrums.txt";
 		String line = null;
 		String textArray = "";
@@ -368,7 +368,7 @@ public class Mandelbrot{
 						return;
 					}else{
 						try{
-							mandelbrot.SetSpectrum(args[argindex+1]);
+							mandelbrot.setSpectrum(args[argindex+1]);
 						}catch(IllegalArgumentException e){
 							System.err.println("Error: the color parameter cannot be found in the list of spectrums, or the spectrum text is improperly formatted.");
 						}catch(FileNotFoundException e){

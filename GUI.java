@@ -47,10 +47,15 @@ public class GUI extends Application{
 	public void start(Stage primaryStage){
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
 		GridPane grid = new GridPane();
-		for (int i = 0; i<3; i++) {
-			ColumnConstraints column = new ColumnConstraints(50);
-			grid.getColumnConstraints().add(column);
-		 }
+		
+		ColumnConstraints column = new ColumnConstraints(80);
+		grid.getColumnConstraints().add(column);
+		column = new ColumnConstraints(80);
+		grid.getColumnConstraints().add(column);
+		column = new ColumnConstraints(200);
+		grid.getColumnConstraints().add(column);
+		
+		
 		grid.setAlignment(Pos.TOP_LEFT);
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -147,6 +152,7 @@ public class GUI extends Application{
 		row++;
 		
 		//Image
+		//Pixels
 		Label lblImage = new Label("Image");
 		grid.add(lblImage,0,row);
 		row++;
@@ -163,14 +169,37 @@ public class GUI extends Application{
 		txtYpixels.setText(String.valueOf(mandelbrot.y_pixels));
 		row++;
 		
+		//Iteration and Escape Radius
+		Label lblIterationLimit = new Label("iteration limit:");
+		grid.add(lblIterationLimit,1,row);
+		TextField txtIterationLimit = new TextField();
+		grid.add(txtIterationLimit,2,row);
+		txtIterationLimit.setText(String.valueOf(mandelbrot.iteration_limit));
+		row++;
+		Label lblIterationColorStart = new Label("color start:");
+		grid.add(lblIterationColorStart,1,row);
+		TextField txtColorStart = new TextField();
+		grid.add(txtColorStart,2,row);
+		txtColorStart.setText(String.valueOf(mandelbrot.iteration_color_start));
+		row++;
+		
+		//Color
+		Label lblPallet = new Label("color pallet");
+		grid.add(lblPallet,0,row);
+		TextField txtPallet = new TextField("blues");
+		grid.add(txtPallet,1,row);
+		row++;		
+		
 		//Generate Button
 		Button btnGenerate = new Button("Generate");
-		grid.add(btnGenerate,0,row,3,1);
+		grid.add(btnGenerate,0,row);
 		row++;
 		
 		//Save Button
 		Button btnSave = new Button("Save");
-		grid.add(btnSave,0,row,3,1);
+		grid.add(btnSave,0,row);
+		TextField txtPath = new TextField("image.png");
+		grid.add(txtPath,1,row,2,1);
 		row++;
 		
 		
@@ -180,9 +209,11 @@ public class GUI extends Application{
 		lblError.setFill(Color.FIREBRICK);
 		
 		//Image View
-		
 		VBox imgBox = new VBox(1,imageView);
 		grid.add(imgBox,4,0,1,row);
+		
+		//Listeners
+		//image view listeners
 		imageView.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			 @Override
 			 public void handle(MouseEvent event) {
@@ -218,7 +249,6 @@ public class GUI extends Application{
 			 }
 		});
 		
-		//Listeners
 		//Generate Button Listener
 		btnGenerate.setOnAction(new EventHandler<ActionEvent>(){
 			@Override
@@ -246,10 +276,6 @@ public class GUI extends Application{
 						errorText += "Error parsing Center Re\n"; hasError = true;}
 				try{y = Double.parseDouble(txtCenterIm.getText());}catch(Exception e){
 						errorText += "Error parsing Center Im\n"; hasError = true;}
-				if(hasError){
-					lblError.setText(errorText);
-					return;
-				}
 				mandelbrot.setCenter(x,y);
 				
 				//Set Aspect
@@ -278,17 +304,14 @@ public class GUI extends Application{
 				int x_pixels = mandelbrot.x_pixels;
 				int y_pixels = mandelbrot.y_pixels;
 				try{x_pixels = Integer.parseInt(txtXpixels.getText());}catch(Exception e){
-						errorText += "Error parsing Width\n"; hasError = true;}
-				try{y_pixels = Integer.parseInt(txtHeight.getText());}catch(Exception e){
-						errorText += "Error parsing Height\n"; hasError = true;}
+						errorText += "Error parsing x pixels\n"; hasError = true;}
+				try{y_pixels = Integer.parseInt(txtYpixels.getText());}catch(Exception e){
+						errorText += "Error parsing y pixels\n"; hasError = true;}
 				//Apply window dimensions
 				mandelbrot.setPixels(x_pixels,y_pixels);
 				if(cbAspect.isSelected()){
 					mandelbrot.setWidth(width);
 					txtHeight.setText(String.valueOf(mandelbrot.y_height));
-					System.out.println(mandelbrot.y_pixels);
-					System.out.println(y_pixels);
-					System.out.println("Test");
 					txtYpixels.setText(String.valueOf(mandelbrot.y_pixels));
 				}else{
 					mandelbrot.setWidthHeight(width,height);
@@ -298,16 +321,35 @@ public class GUI extends Application{
 				lblYminVal.setText(String.valueOf(mandelbrot.y_min));
 				lblYmaxVal.setText(String.valueOf(mandelbrot.y_max));
 				
-				//generate image
-				//BufferedImage img = mandelbrot.generateImage();
-				imageView.setImage(mandelbrot.generateImage());
+				//Iteration
+				int iteration_limit = mandelbrot.iteration_limit;
+				int iteration_color_start = mandelbrot.iteration_color_start;
+				try{iteration_limit = Integer.parseInt(txtIterationLimit.getText());}catch(Exception e){
+						errorText += "Error parsing iteration limit\n"; hasError = true;}
+				try{iteration_color_start = Integer.parseInt(txtColorStart.getText());}catch(Exception e){
+						errorText += "Error parsing color start\n"; hasError = true;}
+				if(iteration_limit <= iteration_color_start || iteration_limit <1 || iteration_color_start <0){
+					errorText += "Invalid limit or color start parameters.\n";
+					hasError = true; 
+				}else{
+					mandelbrot.iteration_limit = iteration_limit;
+					mandelbrot.iteration_color_start = iteration_color_start;
+				}
 				
-				/*File f = new File("image.png");
-				try{
-					ImageIO.write(img, "PNG", f);
-				}catch(Exception e){
-					System.out.println("Failed to write file.");
-				}*/
+				//Color
+				String color = "reds";
+				color = txtPallet.getText();
+				try{mandelbrot.setSpectrum(color);}catch(Exception e){
+					errorText += "Error parsing pallet.\n"; hasError = true;}
+				
+				
+				//If error
+				if(hasError){
+					lblError.setText(errorText);
+				}else{
+					//generate image
+					imageView.setImage(mandelbrot.generateImage());
+				}
 			}
 		});
 		
@@ -315,11 +357,11 @@ public class GUI extends Application{
 			@Override
 			public void handle(ActionEvent event){
 				BufferedImage img = SwingFXUtils.fromFXImage(imageView.getImage(), null);
-				File f = new File("image.png");
+				File f = new File(txtPath.getText());
 				try{
 					ImageIO.write(img, "PNG", f);
 				}catch(Exception e){
-					System.out.println("Failed to write file.");
+					lblError.setText("Failed to write file.");
 				}
 			}
 		});
