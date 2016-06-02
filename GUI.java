@@ -12,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
@@ -25,8 +26,17 @@ import javafx.geometry.Insets;
 public class GUI extends Application{
 	public static Mandelbrot mandelbrot;
 	public static ImageView imageView;
+	public static boolean dragging = false;
+	public static double dragStartX,dragStartY,dragStopX,dragStopY;
+	
 	//public static WritableImage img;
 	public static void main(String[] args){
+		dragStartX = 0;
+		dragStartY = 0;
+		dragStopX = 0;
+		dragStopY = 0;
+		dragging = false;
+		
 		mandelbrot = new Mandelbrot();
 		imageView = new ImageView();
 		imageView.setImage(mandelbrot.generateImage());
@@ -173,6 +183,40 @@ public class GUI extends Application{
 		
 		VBox imgBox = new VBox(1,imageView);
 		grid.add(imgBox,4,0,1,row);
+		imageView.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			 @Override
+			 public void handle(MouseEvent event) {
+				dragStartX = event.getX();
+				dragStartY = event.getY();
+				dragging = true;
+				event.consume();
+			 }
+		});
+		imageView.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+			 @Override
+			 public void handle(MouseEvent event) {
+				//System.out.println(event.getX());
+				dragStopX = event.getX();
+				dragStopY = event.getY();
+				if(dragging && dragStartX < dragStopX && dragStartY < dragStopY){
+					System.out.println("Start X: " + dragStartX);
+					System.out.println("Start Y: " + dragStartY);
+					System.out.println("Stop X: " + dragStopX);
+					System.out.println("Stop Y: " + dragStopY);
+					double x_center = (dragStopX + dragStartX)/2 * mandelbrot.x_width/mandelbrot.x_pixels + mandelbrot.x_min;
+					double y_center = mandelbrot.y_max - (dragStopY + dragStartY)/2 * mandelbrot.y_height/mandelbrot.y_pixels;
+					double x_width = (dragStopX-dragStartX) * mandelbrot.x_width/mandelbrot.x_pixels;
+					double y_height = (dragStopY-dragStartY) * mandelbrot.y_height/mandelbrot.y_pixels;
+					txtCenterRe.setText(String.valueOf(x_center));
+					txtCenterIm.setText(String.valueOf(y_center));
+					txtWidth.setText(String.valueOf(x_width));
+					txtHeight.setText(String.valueOf(y_height));
+					btnGenerate.fire();
+				}
+				dragging = false;
+				event.consume();
+			 }
+		});
 		
 		//Listeners
 		//Generate Button Listener
