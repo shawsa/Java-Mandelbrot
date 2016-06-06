@@ -4,6 +4,9 @@ import javax.imageio.ImageIO;
 
 import javafx.application.Application;
 
+import javafx.beans.value.ChangeListener;
+import javafx.geometry.Orientation;
+
 import javafx.embed.swing.SwingFXUtils;
 
 import javafx.event.ActionEvent;
@@ -46,6 +49,7 @@ public class GUI extends Application{
 	@Override
 	public void start(Stage primaryStage){
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
+		
 		GridPane grid = new GridPane();
 		
 		ColumnConstraints column = new ColumnConstraints(80);
@@ -97,7 +101,7 @@ public class GUI extends Application{
 		grid.add(txtCenterIm,2,row);
 		row++;
 		
-		//Aspect Button
+		//Aspect checkbox
 		CheckBox cbAspect = new CheckBox("Aspect (overrides y height and y pixels)");
 		grid.add(cbAspect,0,row,3,1);
 		cbAspect.setSelected(true);
@@ -186,7 +190,7 @@ public class GUI extends Application{
 		//Color
 		Label lblPallet = new Label("color pallet");
 		grid.add(lblPallet,0,row);
-		TextField txtPallet = new TextField("blues");
+		TextField txtPallet = new TextField("prism");
 		grid.add(txtPallet,1,row);
 		row++;		
 		
@@ -361,24 +365,7 @@ public class GUI extends Application{
 				}
 			}
 		});
-		
-		/*Button btn = new Button("Sign in");
-		HBox hbBtn = new HBox(10);
-		hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-		hbBtn.getChildren().add(btn);
-		grid.add(hbBtn,1,4);
-		
-		final Text actiontarget = new Text();
-		grid.add(actiontarget,1,6);
-		
-		btn.setOnAction(new EventHandler<ActionEvent>(){
-			@Override
-			public void handle(ActionEvent e){
-				actiontarget.setFill(Color.FIREBRICK);
-				actiontarget.setText("Sign in button pressed");
-			}
-		});
-		*/
+
 		//grid.setGridLinesVisible(true);
 		
 		Scene scene = new Scene(grid);

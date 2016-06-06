@@ -150,52 +150,6 @@ public class Mandelbrot{
 		double im = y_max - y * y_height / (y_pixels-1);
 		return new Complex(re,im);
 	}
-		
-	/*public BufferedImage generateImage(){
-		int colors_per_gradient = (iteration_limit - iteration_color_start)/(Spectrum.length-1);
-		//Each gradent includes the lower color, but on the upper number.
-		//To include the final number as well as the color for the set (iteration_limit) we add 2
-		iteration_limit = colors_per_gradient * (Spectrum.length-1) + iteration_color_start + 2;
-		int colors[] = new int[iteration_limit - iteration_color_start + 1];
-
-		//Generate all colors
-		int r,g,b,colors_left;
-		for(int grad=0; grad<Spectrum.length-1; grad++){
-			for(int c=0; c<colors_per_gradient; c++){
-				colors_left = colors_per_gradient - c;
-				r = (colors_left * Spectrum[grad][0] + c * Spectrum[grad+1][0])/colors_per_gradient;
-				g = (colors_left * Spectrum[grad][1] + c * Spectrum[grad+1][1])/colors_per_gradient;
-				b = (colors_left * Spectrum[grad][2] + c * Spectrum[grad+1][2])/colors_per_gradient;
-				colors[grad*colors_per_gradient+c] = (r<<16) + (g<<8) + b;
-			}
-		}
-		//include the last gradent color
-		r  = Spectrum[Spectrum.length-1][0];
-		g  = Spectrum[Spectrum.length-1][1];
-		b  = Spectrum[Spectrum.length-1][2];
-		colors[colors.length-2] = (r<<16) + (g<<8) + b;
-		//the last iteration is set to the set color
-		colors[colors.length-1] = (set_color[0]<<16) + (set_color[1]<<8) + set_color[2];
-		
-		BufferedImage img = new BufferedImage(x_pixels,y_pixels,BufferedImage.TYPE_INT_RGB);
-		System.out.println("Calculating...");
-		System.out.print("0%\r");
-		for(int x=0; x<x_pixels; x++){
-			System.out.print(100*x/x_pixels + "%\r");
-			for(int y=0; y<y_pixels; y++){
-				int my_count;
-				if(!julia){
-					my_count = Converge(PixelsToComplex(x,y))-iteration_color_start;
-				}else{
-					my_count = JuliaConverge(PixelsToComplex(x,y))-iteration_color_start;
-				}
-				if(my_count<0){my_count = 0;}
-				img.setRGB(x,y,colors[my_count]);
-			}
-		}
-		System.out.println("100%");
-		return img;
-	}*/
 	
 	public WritableImage generateImage(){
 		int colors_per_gradient = (iteration_limit - iteration_color_start)/(Spectrum.length-1);
@@ -224,7 +178,6 @@ public class Mandelbrot{
 		//colors[colors.length-2] = (r<<16) + (g<<8) + b;
 		colors[colors.length-2] = Color.rgb(r,g,b);
 		//the last iteration is set to the set color
-		//colors[colors.length-1] = (set_color[0]<<16) + (set_color[1]<<8) + set_color[2];
 		colors[colors.length-1] = Color.rgb(set_color[0],set_color[1],set_color[2]);
 		
 		WritableImage img = new WritableImage(x_pixels,y_pixels);
@@ -242,9 +195,7 @@ public class Mandelbrot{
 					my_count = JuliaConverge(PixelsToComplex(x,y))-iteration_color_start;
 				}
 				if(my_count<0){my_count = 0;}
-				//System.out.println(colors[my_count].toString());
 				pixelWriter.setColor(x,y,colors[my_count]);
-				//img.setRGB(x,y,colors[my_count]);
 			}
 		}
 		System.out.println("100%");
@@ -348,20 +299,6 @@ public class Mandelbrot{
 					}
 					argindex += 3;
 					break;
-				/*case "-r":
-					if(argindex+1>=args.length){
-						System.err.println("Error: -r flag needs floating point value.");
-						return;
-					}else{
-						try{
-							res = Double.parseDouble(args[argindex+1]);
-						}catch(NumberFormatException e){
-							System.err.println("Error: -r needs a floating point decimal argument.");
-							return;
-						}
-					}
-					argindex += 2;
-					break;*/
 				case "-c":
 					if(argindex+1>=args.length){
 						System.err.println("Error: -c flag needs string value.");
