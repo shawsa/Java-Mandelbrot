@@ -59,7 +59,7 @@ public class GUI extends Application{
 		grid.setAlignment(Pos.TOP_LEFT);
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(25,25,25,25));
+		grid.setPadding(new Insets(5,5,5,5));
 		
 		int row = 0;
 		
@@ -230,10 +230,6 @@ public class GUI extends Application{
 				dragStopX = event.getX();
 				dragStopY = event.getY();
 				if(dragging && dragStartX < dragStopX && dragStartY < dragStopY){
-					System.out.println("Start X: " + dragStartX);
-					System.out.println("Start Y: " + dragStartY);
-					System.out.println("Stop X: " + dragStopX);
-					System.out.println("Stop Y: " + dragStopY);
 					double x_center = (dragStopX + dragStartX)/2 * mandelbrot.x_width/mandelbrot.x_pixels + mandelbrot.x_min;
 					double y_center = mandelbrot.y_max - (dragStopY + dragStartY)/2 * mandelbrot.y_height/mandelbrot.y_pixels;
 					double x_width = (dragStopX-dragStartX) * mandelbrot.x_width/mandelbrot.x_pixels;
