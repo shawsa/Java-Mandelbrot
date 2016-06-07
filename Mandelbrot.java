@@ -4,6 +4,7 @@ import javafx.scene.image.*;
 import javafx.scene.paint.Color;
 import java.io.*;
 import javax.imageio.ImageIO;
+import java.lang.Math;
 public class Mandelbrot{
 	//default independent parameters
 	double x_center = -.25;
@@ -15,7 +16,8 @@ public class Mandelbrot{
 	double limit_square = 4;
 	//double res = .5;
 	int[][] Spectrum = {{0,0,0},{255,0,0},{255,255,0},{0,255,0},{0,255,255},{0,0,255}};
-	int[] set_color = {0,0,0};
+	int[] setColor = {0,0,0};
+	int[][] values;
 	
 	boolean julia = false;
 	Complex julia_center = new Complex(0,0);
@@ -29,6 +31,7 @@ public class Mandelbrot{
 		y_height = x_width / aspect;
 		x_pixels = 1920/2;
 		y_pixels = 1080/2;
+		values = new int[x_pixels][y_pixels];
 		recalculateWindow();
 	}
 	//Setters
@@ -48,6 +51,7 @@ public class Mandelbrot{
 		this.aspect = aspect;
 		y_height = x_width / aspect;
 		y_pixels = (int) Math.round(x_pixels/aspect);
+		
 		recalculateWindow();
 	}
 	public void setWidth(double width){
@@ -119,8 +123,8 @@ public class Mandelbrot{
 			}
 			String[] current_color = colors[colors.length-1].split(",");
 			for(int j=0; j<3; j++){
-				set_color[j] = Integer.parseInt(current_color[j]);
-				if(set_color[j]<0 || set_color[j]>255){throw new IllegalArgumentException();}
+				setColor[j] = Integer.parseInt(current_color[j]);
+				if(setColor[j]<0 || setColor[j]>255){throw new IllegalArgumentException();}
 			}
 		}catch(Exception e){throw new IllegalArgumentException();}
 	}
@@ -128,7 +132,7 @@ public class Mandelbrot{
 	public int Converge(Complex z){
 		int i = 0;
 		Complex w = z;
-		while(w.ModSquare()<limit_square && i< iteration_limit-1){
+		while(w.ModSquare()<limit_square && i< iteration_limit){
 			i++;
 			w = w.Square().Add(z);
 		}
@@ -138,7 +142,7 @@ public class Mandelbrot{
 	public int JuliaConverge(Complex z){
 		int i = 0;
 		Complex w = z;
-		while(w.ModSquare()<limit_square && i< iteration_limit-1){
+		while(w.ModSquare()<limit_square && i< iteration_limit){
 			i++;
 			w = w.Square().Add(julia_center);
 		}
@@ -151,8 +155,84 @@ public class Mandelbrot{
 		return new Complex(re,im);
 	}
 	
-	public WritableImage generateImage(){
-		int colors_per_gradient = (iteration_limit - iteration_color_start)/(Spectrum.length-1);
+	public int[][] calculateValues(){
+		int values[][] = new int[x_pixels][y_pixels];
+		System.out.println("Calculating...");
+		System.out.print("0%\r");
+		if(!julia){
+			for(int x=0; x<x_pixels; x++){
+				System.out.print(100*x/x_pixels + "%\r");
+				for(int y=0; y<y_pixels; y++){
+					values[x][y] = Converge(PixelsToComplex(x,y));
+				}
+			}
+		}else{
+			for(int x=0; x<x_pixels; x++){
+				System.out.print(100*x/x_pixels + "%\r");
+				for(int y=0; y<y_pixels; y++){
+					values[x][y] = JuliaConverge(PixelsToComplex(x,y));
+				}
+			}
+		}
+		System.out.println("100%");
+		this.values = values;
+		return values;
+	}
+	
+	public WritableImage colorImage(String scale){
+		int colorCount = iteration_limit - iteration_color_start;
+		Color colors[] = new Color[colorCount + 1];
+		//Set color
+		colors[colorCount] = Color.rgb(setColor[0],setColor[1],setColor[2]);
+		//Last color
+		colors[colorCount-1] = Color.rgb(Spectrum[Spectrum.length-1][0], Spectrum[Spectrum.length-1][1],
+				Spectrum[Spectrum.length-1][2]);
+		/*
+			Originally the iteration_limit was recalculated so that their was an equal number of
+			iterations assigned to each color gradient and so that each end point of the gradient
+			was included. This meant that the iteration limit was increased to a multiple of one
+			less than the number of colors in the spectrum (the number of gradients between colors)
+			plus one for the end point of the last gradient, plus one again for the set color.
+			
+			With that method the iteration_limit could change each time a spectrum with a different
+			number of colors was applied. It is now a priorety to keep the iteration limit the same.
+			We will instead sacrifice the criterion that each end point color must be hit. Since
+			we are capable of using iteration limits that are significantly larger than the number
+			of color endpoints in the spectrum it is the case that some itteration will come
+			sufficiently close to each color endpoint.
+		*/
+		
+		switch(scale){
+			case "logarithmic":
+				for(int i=0; i<colorCount; i++){
+					//Map the colors to the log interval [0,#colors-1)
+					double base = Math.pow(colorCount+1.0,1.0/(Spectrum.length-1));
+					double myScale = Math.log(1.0+i)/Math.log(base);
+					int grad = (int)myScale;
+					double weight = myScale - grad;
+					int r = (int)((1-weight) * Spectrum[grad][0] + weight * Spectrum[grad+1][0]);
+					int g = (int)((1-weight) * Spectrum[grad][1] + weight * Spectrum[grad+1][1]);
+					int b = (int)((1-weight) * Spectrum[grad][2] + weight * Spectrum[grad+1][2]);
+					colors[i] = Color.rgb(r,g,b);
+				}
+				break;
+			default:
+				System.out.println("Error: " + scale + "is not a vaild scale parameter. Defaulting to linear.");
+			case "linear":
+				//
+				for(int i=0; i<colorCount; i++){
+					//Map the colors to the interval [0,#colors-1)
+					double myScale = (1.0*i) * (Spectrum.length-1) / colorCount;
+					int grad = (int)myScale;
+					double weight = myScale - grad;
+					int r = (int)((1-weight) * Spectrum[grad][0] + weight * Spectrum[grad+1][0]);
+					int g = (int)((1-weight) * Spectrum[grad][1] + weight * Spectrum[grad+1][1]);
+					int b = (int)((1-weight) * Spectrum[grad][2] + weight * Spectrum[grad+1][2]);
+					colors[i] = Color.rgb(r,g,b);
+				}
+		}
+		
+		/*int colors_per_gradient = (iteration_limit - iteration_color_start)/(Spectrum.length-1);
 		//Each gradent includes the lower color, but not the upper number.
 		//To include the final number as well as the color for the set (iteration_limit) we add 2
 		iteration_limit = colors_per_gradient * (Spectrum.length-1) + iteration_color_start + 2;
@@ -178,28 +258,26 @@ public class Mandelbrot{
 		//colors[colors.length-2] = (r<<16) + (g<<8) + b;
 		colors[colors.length-2] = Color.rgb(r,g,b);
 		//the last iteration is set to the set color
-		colors[colors.length-1] = Color.rgb(set_color[0],set_color[1],set_color[2]);
+		colors[colors.length-1] = Color.rgb(setColor[0],setColor[1],setColor[2]);
+		*/
 		
 		WritableImage img = new WritableImage(x_pixels,y_pixels);
 		PixelWriter pixelWriter = img.getPixelWriter();
 		
-		System.out.println("Calculating...");
-		System.out.print("0%\r");
 		for(int x=0; x<x_pixels; x++){
-			System.out.print(100*x/x_pixels + "%\r");
 			for(int y=0; y<y_pixels; y++){
 				int my_count;
-				if(!julia){
-					my_count = Converge(PixelsToComplex(x,y))-iteration_color_start;
-				}else{
-					my_count = JuliaConverge(PixelsToComplex(x,y))-iteration_color_start;
-				}
+				my_count = values[x][y] - iteration_color_start;
 				if(my_count<0){my_count = 0;}
 				pixelWriter.setColor(x,y,colors[my_count]);
 			}
 		}
-		System.out.println("100%");
 		return img;
+	}
+	
+	public WritableImage generateImage(){
+		calculateValues();
+		return colorImage("logarithmic");
 	}
 
 	public static void main(String args[]){
