@@ -232,35 +232,6 @@ public class Mandelbrot{
 				}
 		}
 		
-		/*int colors_per_gradient = (iteration_limit - iteration_color_start)/(Spectrum.length-1);
-		//Each gradent includes the lower color, but not the upper number.
-		//To include the final number as well as the color for the set (iteration_limit) we add 2
-		iteration_limit = colors_per_gradient * (Spectrum.length-1) + iteration_color_start + 2;
-		//int colors[] = new int[iteration_limit - iteration_color_start + 1];
-		Color colors[] = new Color[iteration_limit - iteration_color_start];
-
-		//Generate all colors
-		int r,g,b,colors_left;
-		for(int grad=0; grad<Spectrum.length-1; grad++){
-			for(int c=0; c<colors_per_gradient; c++){
-				colors_left = colors_per_gradient - c;
-				r = (colors_left * Spectrum[grad][0] + c * Spectrum[grad+1][0])/colors_per_gradient;
-				g = (colors_left * Spectrum[grad][1] + c * Spectrum[grad+1][1])/colors_per_gradient;
-				b = (colors_left * Spectrum[grad][2] + c * Spectrum[grad+1][2])/colors_per_gradient;
-				//colors[grad*colors_per_gradient+c] = (r<<16) + (g<<8) + b;
-				colors[grad*colors_per_gradient+c] = Color.rgb(r,g,b);
-			}
-		}
-		//include the last gradent color
-		r  = Spectrum[Spectrum.length-1][0];
-		g  = Spectrum[Spectrum.length-1][1];
-		b  = Spectrum[Spectrum.length-1][2];
-		//colors[colors.length-2] = (r<<16) + (g<<8) + b;
-		colors[colors.length-2] = Color.rgb(r,g,b);
-		//the last iteration is set to the set color
-		colors[colors.length-1] = Color.rgb(setColor[0],setColor[1],setColor[2]);
-		*/
-		
 		WritableImage img = new WritableImage(x_pixels,y_pixels);
 		PixelWriter pixelWriter = img.getPixelWriter();
 		
@@ -277,7 +248,7 @@ public class Mandelbrot{
 	
 	public WritableImage generateImage(){
 		calculateValues();
-		return colorImage("logarithmic");
+		return colorImage("linear");
 	}
 
 	public static void main(String args[]){

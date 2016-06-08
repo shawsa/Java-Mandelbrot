@@ -1,17 +1,13 @@
 import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
-
 import javafx.application.Application;
-
 import javafx.beans.value.ChangeListener;
+import javafx.collections.*;
 import javafx.geometry.Orientation;
-
 import javafx.embed.swing.SwingFXUtils;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
@@ -19,12 +15,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
-
 import javafx.stage.Stage;
-
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
-
 
 public class GUI extends Application{
 	public static Mandelbrot mandelbrot;
@@ -172,27 +165,40 @@ public class GUI extends Application{
 		grid.add(txtYpixels,2,row);
 		txtYpixels.setText(String.valueOf(mandelbrot.y_pixels));
 		row++;
-		
-		//Iteration and Escape Radius
+		//Iteration
 		Label lblIterationLimit = new Label("iteration limit:");
 		grid.add(lblIterationLimit,1,row);
 		TextField txtIterationLimit = new TextField();
 		grid.add(txtIterationLimit,2,row);
 		txtIterationLimit.setText(String.valueOf(mandelbrot.iteration_limit));
 		row++;
-		Label lblIterationColorStart = new Label("color start:");
-		grid.add(lblIterationColorStart,1,row);
-		TextField txtColorStart = new TextField();
-		grid.add(txtColorStart,2,row);
-		txtColorStart.setText(String.valueOf(mandelbrot.iteration_color_start));
-		row++;
 		
 		//Color
-		Label lblPallet = new Label("color pallet");
-		grid.add(lblPallet,0,row);
+		Label lblColor = new Label("Coloring");
+		grid.add(lblColor,0,row,3,1);
+		row++;
+		Label lblIterationColorStart = new Label("color start");
+		grid.add(lblIterationColorStart,1,row);
+		TextField txtColorStart = new TextField("0");
+		grid.add(txtColorStart,2,row);
+		row++;
+		Label lblPallet = new Label("pallet");
+		grid.add(lblPallet,1,row);
 		TextField txtPallet = new TextField("prism");
-		grid.add(txtPallet,1,row);
-		row++;		
+		grid.add(txtPallet,2,row);
+		row++;
+		Label lblColorScale = new Label("color scaling");
+		grid.add(lblColorScale,1,row);
+		ObservableList<String> colorScaleOptions = FXCollections.observableArrayList("linear","logarithmic");
+		ComboBox<String> cbxColorScale = new ComboBox<>(colorScaleOptions);
+		grid.add(cbxColorScale,2,row);
+		cbxColorScale.setValue("linear");
+		row++;
+		
+		//Recolor Button
+		Button btnRecolor = new Button("Recolor");
+		grid.add(btnRecolor,1,row);
+		row++;
 		
 		//Generate Button
 		Button btnGenerate = new Button("Generate");
@@ -205,7 +211,6 @@ public class GUI extends Application{
 		TextField txtPath = new TextField("image.png");
 		grid.add(txtPath,1,row,2,1);
 		row++;
-		
 		
 		//Error text
 		Text lblError = new Text();
@@ -247,6 +252,34 @@ public class GUI extends Application{
 				dragging = false;
 				event.consume();
 			 }
+		});
+		
+		//Recolor Listener
+		btnRecolor.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent event){
+				String errorText = "";
+				lblError.setText("");
+				boolean hasError = false;
+				int iteration_color_start = mandelbrot.iteration_color_start;
+				try{iteration_color_start = Integer.parseInt(txtColorStart.getText());}catch(Exception e){
+						errorText += "Error parsing color start\n"; hasError = true;}
+				if(mandelbrot.iteration_limit <= iteration_color_start || mandelbrot.iteration_limit <1 || iteration_color_start <0){
+					errorText += "Invalid limit or color start parameters.\n";
+					hasError = true; 
+				}else{
+					mandelbrot.iteration_color_start = iteration_color_start;
+				}
+				String color = "reds";
+				color = txtPallet.getText();
+				try{mandelbrot.setSpectrum(color);}catch(Exception e){
+					errorText += "Error parsing pallet.\n"; hasError = true;}
+				if(hasError){
+					lblError.setText(errorText);
+				}else{
+					imageView.setImage(mandelbrot.colorImage(cbxColorScale.getValue().toString()));
+				}
+			}
 		});
 		
 		//Generate Button Listener
@@ -336,19 +369,23 @@ public class GUI extends Application{
 					mandelbrot.iteration_color_start = iteration_color_start;
 				}
 				
+				
+				/*
 				//Color
 				String color = "reds";
 				color = txtPallet.getText();
 				try{mandelbrot.setSpectrum(color);}catch(Exception e){
 					errorText += "Error parsing pallet.\n"; hasError = true;}
-				
+				*/
 				
 				//If error
 				if(hasError){
 					lblError.setText(errorText);
 				}else{
 					//generate image
-					imageView.setImage(mandelbrot.generateImage());
+					mandelbrot.calculateValues();
+					btnRecolor.fire();
+					//imageView.setImage(mandelbrot.generateImage());
 				}
 			}
 		});
