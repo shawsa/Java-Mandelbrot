@@ -3,6 +3,12 @@ interface and a GUI.
 
 
 
+RUNNING THE PROGRAM
+To run this program download the file mandelbrot.jar and run it. You will need the most recent version
+of Java installed.
+
+
+
 IMAGE
 Drag a box to zoom in on a specific area of the set. Note that there is no visible response from the 
 program until the calculations are complete. 
