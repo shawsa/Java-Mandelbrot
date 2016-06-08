@@ -195,10 +195,10 @@ public class GUI extends Application{
 		
 		Label lblColorScale = new Label("color scaling");
 		grid.add(lblColorScale,1,row);
-		ObservableList<String> colorScaleOptions = FXCollections.observableArrayList("linear","logarithmic");
+		ObservableList<String> colorScaleOptions = FXCollections.observableArrayList(mandelbrot.listScales());
 		ComboBox<String> cbxColorScale = new ComboBox<>(colorScaleOptions);
 		grid.add(cbxColorScale,2,row);
-		cbxColorScale.setValue("linear");
+		cbxColorScale.setValue(mandelbrot.listScales()[0]);
 		row++;
 		
 		//Recolor Button

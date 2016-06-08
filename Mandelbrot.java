@@ -223,6 +223,13 @@ public class Mandelbrot{
 		return values;
 	}
 	
+	public String[] listScales(){
+		String[] ret = {"linear",
+						"logarithmic",
+						"average"};
+		return ret;
+	}
+	
 	public WritableImage colorImage(String scale){
 		int colorCount = iteration_limit - iteration_color_start;
 		Color colors[] = new Color[colorCount + 1];
@@ -260,10 +267,72 @@ public class Mandelbrot{
 					colors[i] = Color.rgb(r,g,b);
 				}
 				break;
+			case "average":
+				//count pixels of each value
+				int[] bins = new int[colorCount+1];
+				for(int x=0; x<x_pixels; x++){
+					for(int y=0; y<y_pixels; y++){
+						int shiftedValue = values[x][y] - iteration_color_start;
+						if(shiftedValue >= 0){
+							bins[values[x][y] - iteration_color_start]++;
+						}
+					}
+				}
+				int totalColored = 0; // = x_pixels*y_pixels - bins[bins.length-1];
+				for(int i=0; i<bins.length-1; i++){
+					totalColored += bins[i];
+				}
+				
+				//last color is the last iteration is already assigned
+				int pixelsPerGradient = (totalColored)/(Spectrum.length-1);
+				//for each gradient assign colors
+				//calculate value ranges for each gradient
+				int[] spectrumStarts = new int[Spectrum.length-1];
+				int startValue = 0;
+				int endValue = 0;
+				int rangeTotal = 0;
+				for(int grad = 0; grad < Spectrum.length-2; grad++){
+					startValue = endValue;
+					endValue = startValue;
+					//System.out.println(endValue);
+					rangeTotal = 0;
+					while(rangeTotal <= pixelsPerGradient){
+						rangeTotal += bins[endValue];
+						endValue++;
+					}
+					spectrumStarts[grad] = startValue;
+				}
+				//last gradient gets remaining colors
+				spectrumStarts[spectrumStarts.length-1] = endValue;
+				//Assign colors for each gradient
+				for(int grad = 0; grad < Spectrum.length-1; grad++){
+					if(grad < Spectrum.length-2){rangeTotal = spectrumStarts[grad+1] - spectrumStarts[grad];}
+					else{rangeTotal = colorCount -1 - spectrumStarts[grad];}
+					//System.out.println("Spectrum " + grad + " start " + spectrumStarts[grad] + " total " + rangeTotal);
+					for(int i=0; i < rangeTotal; i++){
+						double weight = 1.0 * i / (rangeTotal);
+						int r = (int)((1-weight) * Spectrum[grad][0] + weight * Spectrum[grad+1][0]);
+						int g = (int)((1-weight) * Spectrum[grad][1] + weight * Spectrum[grad+1][1]);
+						int b = (int)((1-weight) * Spectrum[grad][2] + weight * Spectrum[grad+1][2]);
+						colors[spectrumStarts[grad] + i] = Color.rgb(r,g,b);
+					}
+				}
+				
+				
+				/*Debugging
+				for(int i=0; i<bins.length; i++){
+					System.out.println(i +": " + bins[i]);
+				}
+				System.out.println("Total Colored: " + totalColored);
+				System.out.println("Pixels per gradient: " + pixelsPerGradient);
+				for(int i=0; i<spectrumStarts.length; i++){
+					System.out.println("Spectrum " + i + ": " + spectrumStarts[i]);
+				}*/
+				
+				break;
 			default:
 				System.out.println("Error: " + scale + "is not a vaild scale parameter. Defaulting to linear.");
 			case "linear":
-				//
 				for(int i=0; i<colorCount; i++){
 					//Map the colors to the interval [0,#colors-1)
 					double myScale = (1.0*i) * (Spectrum.length-1) / colorCount;
@@ -291,6 +360,7 @@ public class Mandelbrot{
 	}
 	
 	public WritableImage generateImage(){
+		//this exists as legacy code for the command line program
 		calculateValues();
 		return colorImage("linear");
 	}
