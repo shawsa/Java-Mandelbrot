@@ -177,16 +177,22 @@ public class GUI extends Application{
 		Label lblColor = new Label("Coloring");
 		grid.add(lblColor,0,row,3,1);
 		row++;
+		
 		Label lblIterationColorStart = new Label("color start");
 		grid.add(lblIterationColorStart,1,row);
 		TextField txtColorStart = new TextField("0");
 		grid.add(txtColorStart,2,row);
 		row++;
+		
 		Label lblPallet = new Label("pallet");
 		grid.add(lblPallet,1,row);
-		TextField txtPallet = new TextField("prism");
-		grid.add(txtPallet,2,row);
+		ObservableList<String> spectrumList = FXCollections.observableArrayList(mandelbrot.listSpectrums());
+		ComboBox<String> cbxPallet = new ComboBox<>(spectrumList);
+		grid.add(cbxPallet,2,row);
+		cbxPallet.setValue(mandelbrot.listSpectrums()[0]);
 		row++;
+		
+		
 		Label lblColorScale = new Label("color scaling");
 		grid.add(lblColorScale,1,row);
 		ObservableList<String> colorScaleOptions = FXCollections.observableArrayList("linear","logarithmic");
@@ -271,7 +277,7 @@ public class GUI extends Application{
 					mandelbrot.iteration_color_start = iteration_color_start;
 				}
 				String color = "reds";
-				color = txtPallet.getText();
+				color = cbxPallet.getValue();
 				try{mandelbrot.setSpectrum(color);}catch(Exception e){
 					errorText += "Error parsing pallet.\n"; hasError = true;}
 				if(hasError){

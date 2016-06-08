@@ -15,7 +15,7 @@ public class Mandelbrot{
 	int iteration_color_start = 0;
 	double limit_square = 4;
 	//double res = .5;
-	int[][] Spectrum = {{0,0,0},{255,0,0},{255,255,0},{0,255,0},{0,255,255},{0,0,255}};
+	int[][] Spectrum = {{0,0,0},{255,0,0},{255,200,200}};
 	int[] setColor = {0,0,0};
 	int[][] values;
 	
@@ -42,11 +42,13 @@ public class Mandelbrot{
 		y_min = y_center - .5 * y_height;
 		y_max = y_center + .5 * y_height;
 	}
+	
 	public void setCenter(double x, double y){
 		x_center = x;
 		y_center = y;
 		recalculateWindow();
 	}
+	
 	public void setAspect(double aspect){
 		this.aspect = aspect;
 		y_height = x_width / aspect;
@@ -54,18 +56,21 @@ public class Mandelbrot{
 		
 		recalculateWindow();
 	}
+	
 	public void setWidth(double width){
 		x_width = width;
 		y_height = width/aspect;
 		y_pixels = (int) Math.round(x_pixels/aspect);
 		recalculateWindow();
 	}
+	
 	public void setHeight(double height){
 		y_height = height;
 		x_width = height * aspect;
 		x_pixels = (int) Math.round(y_pixels*aspect);
 		recalculateWindow();
 	}
+	
 	public void setWidthHeight(double width, double height){
 		x_width = width;
 		y_height = height;
@@ -73,6 +78,7 @@ public class Mandelbrot{
 		y_pixels = (int) Math.round(x_pixels/aspect);
 		recalculateWindow();
 	}
+	
 	public void setWindow(double x_min, double x_max, double y_min, double y_max){
 		this.x_min = x_min;
 		this.x_max = x_max;
@@ -85,48 +91,86 @@ public class Mandelbrot{
 		aspect = x_width / y_height;
 		y_pixels = (int) Math.round(x_pixels/aspect);
 	}
+	
 	public void setPixels(int x, int y){
 		x_pixels = x;
 		y_pixels = y;
 	}
+	
 	public void setJulia(double x, double y){
 		julia_center = new Complex(x,y);
-	}	
-		
-	public void setSpectrum(String arg) throws IllegalArgumentException,FileNotFoundException, IOException{
-		String color_file = "spectrums.txt";
-		String line = null;
-		String textArray = "";
-		FileReader fileReader = new FileReader(color_file);
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		boolean found_spectrum = false;
-		while((line = bufferedReader.readLine()) != null){
-			if(line.equals(arg)){
-				textArray = bufferedReader.readLine();
-				found_spectrum = true;
+	}
+
+	public String[] listSpectrums(){
+		String[] ret = {"prism",
+						"reds",
+						"greens",
+						"blues",
+						"purples",
+						"golds",
+						"silvers",
+						"reef",
+						"glacier",
+						"fire",
+						"treasure",
+						"soft",
+						"grue",
+						"gray-scale",
+						"stripes"};
+		return ret;
+	}
+	
+	public void setSpectrum(String arg) throws IllegalArgumentException{
+		switch(arg){
+			case "reds": 
+				Spectrum = new int[][]{{10,0,0},{ 255,0,0},{ 255,200,200}}; 
+				setColor = new int[]{0,0,0}; 
 				break;
-			}
+			case "greens": Spectrum = new int[][]{{0,10,0},{ 0,255,0},{ 200,255,200}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "blues": Spectrum = new int[][]{{0,0,10},{ 0,0,255},{ 200,200,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "reef": Spectrum = new int[][]{{0,0,10},{0,0,255},{0,255,255},{0,255,0},{255,0,255},{255,200,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "prism": Spectrum = new int[][]{{0,0,0},{255,0,0},{255,255,0},{0,255,0},{0,255,255},{0,0,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "glacier": Spectrum = new int[][]{{200,200,255},{0,0,255},{200,200,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "fire": Spectrum = new int[][]{{50,0,0},{150,0,0},{150,50,0},{0,0,150}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "purples": Spectrum = new int[][]{{10,0,10},{255,0,255,255,200,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "golds": Spectrum = new int[][]{{0,0,0},{255,150,0},{255,255,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "silvers": Spectrum = new int[][]{{0,0,0},{255,255,255},{200,200,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "treasure": Spectrum = new int[][]{{0,0,0},{255,150,0},{255,255,255}};
+				setColor = new int[]{200,200,200};
+				break;
+			case "soft": Spectrum = new int[][]{{99,192,255},{107,255,153},{255,171,45}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "grue": Spectrum = new int[][]{{0,0,0},{0,0,255},{0,255,0},{0,255,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "gray-scale": Spectrum = new int[][]{{10,10,10},{255,255,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			case "stripes": Spectrum = new int[][]{{0,0,0},{0,0,0},{255,255,255},{255,255,255},{0,0,0},{0,0,0},{255,255,255}};
+				setColor = new int[]{0,0,0};
+				break;
+			default:
+				throw new IllegalArgumentException();
 		}
-		if(!found_spectrum){throw new IllegalArgumentException();}
-		textArray = textArray.replaceAll("\\s","");
-		//parse text array to spectrum
-		try{
-			String colors[] = textArray.split(";");
-			//for(int i=0; i<colors.length-1; i++){System.out.println(colors[i]);}
-			Spectrum = new int[colors.length-1][3];
-			for(int i=0; i<colors.length-1; i++){
-				String[] current_color = colors[i].split(",");
-				for(int j=0; j<3; j++){
-					Spectrum[i][j] = Integer.parseInt(current_color[j]);
-					if(Spectrum[i][j]<0 || Spectrum[i][j]>255){throw new IllegalArgumentException();}
-				}
-			}
-			String[] current_color = colors[colors.length-1].split(",");
-			for(int j=0; j<3; j++){
-				setColor[j] = Integer.parseInt(current_color[j]);
-				if(setColor[j]<0 || setColor[j]>255){throw new IllegalArgumentException();}
-			}
-		}catch(Exception e){throw new IllegalArgumentException();}
 	}
 	
 	public int Converge(Complex z){
@@ -357,10 +401,10 @@ public class Mandelbrot{
 							mandelbrot.setSpectrum(args[argindex+1]);
 						}catch(IllegalArgumentException e){
 							System.err.println("Error: the color parameter cannot be found in the list of spectrums, or the spectrum text is improperly formatted.");
-						}catch(FileNotFoundException e){
+						/*}catch(FileNotFoundException e){
 							System.err.println("Error: the file spectrums.txt was not found.");
 						}catch(IOException e){
-							System.err.println("Error: there was an unexpected error reading from the file spectrums.txt");
+							System.err.println("Error: there was an unexpected error reading from the file spectrums.txt");*/
 						}
 					}
 					argindex += 2;

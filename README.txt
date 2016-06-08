@@ -1,4 +1,13 @@
-This is a java program for generating images of the mandelbrot set.
+This is a java program for generating images of the mandelbrot set. It supports both a command line 
+interface and a GUI. 
+
+Drag a box to zoom in on a specific area of the set. Note that there is no visible response from the 
+program until the calculations are complete. 
+
+
+Command Line interface Notes:
+	Since the introduction of the GUI this is recieving little support. If changes cause a compile time
+	error, they will likely be investigated. Runtime errors will likely not be caught.
 
 NAME
 	Mandelbrot - generates images of the mandelbrot set
