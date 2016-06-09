@@ -295,8 +295,8 @@ public class Mandelbrot{
 					startValue = endValue;
 					endValue = startValue;
 					//System.out.println(endValue);
-					rangeTotal = 0;
-					while(rangeTotal <= pixelsPerGradient){
+					//rangeTotal = 0;
+					while(rangeTotal <= pixelsPerGradient * (grad+1)){
 						rangeTotal += bins[endValue];
 						endValue++;
 					}
