@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.*;
+import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -44,6 +45,7 @@ public class GUI extends Application{
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
 		
 		GridPane grid = new GridPane();
+		
 		
 		ColumnConstraints column = new ColumnConstraints(80);
 		grid.getColumnConstraints().add(column);
@@ -224,8 +226,10 @@ public class GUI extends Application{
 		lblError.setFill(Color.FIREBRICK);
 		
 		//Image View
-		VBox imgBox = new VBox(1,imageView);
-		grid.add(imgBox,4,0,1,row);
+		VBox pictureVBox = new VBox();
+		/*Label lblStatus = new Label("Done");
+		pictureVBox.getChildren().add(lblStatus);*/
+		pictureVBox.getChildren().add(imageView);
 		
 		//Listeners
 		//image view listeners
@@ -375,23 +379,12 @@ public class GUI extends Application{
 					mandelbrot.iteration_color_start = iteration_color_start;
 				}
 				
-				
-				/*
-				//Color
-				String color = "reds";
-				color = txtPallet.getText();
-				try{mandelbrot.setSpectrum(color);}catch(Exception e){
-					errorText += "Error parsing pallet.\n"; hasError = true;}
-				*/
-				
 				//If error
 				if(hasError){
 					lblError.setText(errorText);
 				}else{
-					//generate image
 					mandelbrot.calculateValues();
 					btnRecolor.fire();
-					//imageView.setImage(mandelbrot.generateImage());
 				}
 			}
 		});
@@ -411,7 +404,19 @@ public class GUI extends Application{
 
 		//grid.setGridLinesVisible(true);
 		
-		Scene scene = new Scene(grid);
+		
+		ScrollPane leftScrollPane = new ScrollPane();
+		//leftScrollPane.setMinViewportWidth(400);
+		leftScrollPane.setContent(grid);
+		GridPane mainGrid = new GridPane();
+		column = new ColumnConstraints(400);
+		mainGrid.getColumnConstraints().add(column);
+		mainGrid.add(leftScrollPane,0,0);
+		ScrollPane rightScrollPane = new ScrollPane();
+		rightScrollPane.setContent(pictureVBox);
+		mainGrid.add(rightScrollPane,1,0);
+		
+		Scene scene = new Scene(mainGrid);
 		primaryStage.setScene(scene);
 		
 		primaryStage.show();

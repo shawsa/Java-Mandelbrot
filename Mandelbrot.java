@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.lang.Math;
 public class Mandelbrot{
 	//default independent parameters
+	String status = "";
 	double x_center = -.25;
 	double y_center = 0;
 	double x_width = 4;
@@ -34,8 +35,12 @@ public class Mandelbrot{
 		values = new int[x_pixels][y_pixels];
 		recalculateWindow();
 	}
-	//Setters
-		//Sets window ranges from center and width/height
+	
+	public String getStatus(){
+		return this.status;
+	}
+	
+	//Sets window ranges from center and width/height		
 	public void recalculateWindow(){
 		x_min = x_center - .5 * x_width;
 		x_max = x_center + .5 * x_width;
@@ -203,8 +208,10 @@ public class Mandelbrot{
 		int values[][] = new int[x_pixels][y_pixels];
 		System.out.println("Calculating...");
 		System.out.print("0%\r");
+		this.status = "0%";
 		if(!julia){
 			for(int x=0; x<x_pixels; x++){
+				this.status = 100*x/x_pixels + "%";
 				System.out.print(100*x/x_pixels + "%\r");
 				for(int y=0; y<y_pixels; y++){
 					values[x][y] = Converge(PixelsToComplex(x,y));
@@ -219,6 +226,7 @@ public class Mandelbrot{
 			}
 		}
 		System.out.println("100%");
+		this.status = "100%";
 		this.values = values;
 		return values;
 	}
