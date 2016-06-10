@@ -44,22 +44,8 @@ public class GUI extends Application{
 	public void start(Stage primaryStage){
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
 		
-		//GridPane grid = new GridPane();
 		VBox parameterVBox = new VBox();
-		//parameterVBox.setMinViewportWidth(350);
-		
-		
-		/*ColumnConstraints column = new ColumnConstraints(80);
-		grid.getColumnConstraints().add(column);
-		column = new ColumnConstraints(80);
-		grid.getColumnConstraints().add(column);
-		column = new ColumnConstraints(200);
-		grid.getColumnConstraints().add(column);
-		grid.setAlignment(Pos.TOP_LEFT);
-		grid.setHgap(10);
-		grid.setVgap(gridVgap);
-		grid.setPadding(new Insets(5,5,5,5));*/
-		
+
 		int gridVgap = 5;		
 		int mainGridRow = 0;
 		
@@ -137,10 +123,8 @@ public class GUI extends Application{
 		gridWindow.add(lblYmaxVal,1,rowWindowGrid);
 		lblYmaxVal.setText(String.valueOf(mandelbrot.y_max));
 		rowWindowGrid++;
-		
 		tpWindow.setContent(gridWindow);
 		parameterVBox.getChildren().add(tpWindow);
-		mainGridRow++;
 		
 		//Julia
 		TitledPane tpJulia = new TitledPane();
@@ -161,9 +145,75 @@ public class GUI extends Application{
 		gridJulia.add(lblJuliaIm,0,rowJuliaGrid);
 		TextField txtJuliaIm = new TextField();
 		gridJulia.add(txtJuliaIm,1,rowJuliaGrid);
+		rowJuliaGrid++;
+		Button btnSetJulia = new Button("Set Julia to Center");
+		gridJulia.add(btnSetJulia,0,rowJuliaGrid,2,1);
+		rowJuliaGrid++;
 		tpJulia.setContent(gridJulia);
 		parameterVBox.getChildren().add(tpJulia);
-		mainGridRow++;
+		
+		//Mobius
+		TitledPane tpMobius = new TitledPane();
+		tpMobius.setText("Mobius");
+		tpMobius.setExpanded(false);
+		GridPane gridMobius = new GridPane();
+		gridMobius.setVgap(gridVgap);
+		int rowMobiusGrid = 0;
+		CheckBox cbMobius = new CheckBox("Mobius");
+		gridMobius.add(cbMobius,0,rowMobiusGrid,4,1);
+		rowMobiusGrid++;
+		//A
+		Label lblA = new Label("A: ");
+		gridMobius.add(lblA,0,rowMobiusGrid);
+		TextField txtARe = new TextField(String.valueOf(mandelbrot.A.r));
+		gridMobius.add(txtARe,1,rowMobiusGrid);
+		Label lblAPlus = new Label(" + ");
+		gridMobius.add(lblAPlus,2,rowMobiusGrid);
+		TextField txtAIm = new TextField(String.valueOf(mandelbrot.A.i));
+		gridMobius.add(txtAIm,3,rowMobiusGrid);
+		Label lblAi = new Label(" i");
+		gridMobius.add(lblAi,4,rowMobiusGrid);
+		rowMobiusGrid++;
+		//B
+		Label lblB = new Label("B: ");
+		gridMobius.add(lblB,0,rowMobiusGrid);
+		TextField txtBRe = new TextField(String.valueOf(mandelbrot.B.r));
+		gridMobius.add(txtBRe,1,rowMobiusGrid);
+		Label lblBPlus = new Label(" + ");
+		gridMobius.add(lblBPlus,2,rowMobiusGrid);
+		TextField txtBIm = new TextField(String.valueOf(mandelbrot.B.i));
+		gridMobius.add(txtBIm,3,rowMobiusGrid);
+		Label lblBi = new Label(" i");
+		gridMobius.add(lblBi,4,rowMobiusGrid);
+		rowMobiusGrid++;
+		//C
+		Label lblC = new Label("C: ");
+		gridMobius.add(lblC,0,rowMobiusGrid);
+		TextField txtCRe = new TextField(String.valueOf(mandelbrot.C.r));
+		gridMobius.add(txtCRe,1,rowMobiusGrid);
+		Label lblCPlus = new Label(" + ");
+		gridMobius.add(lblCPlus,2,rowMobiusGrid);
+		TextField txtCIm = new TextField(String.valueOf(mandelbrot.C.i));
+		gridMobius.add(txtCIm,3,rowMobiusGrid);
+		Label lblCi = new Label(" i");
+		gridMobius.add(lblCi,4,rowMobiusGrid);
+		rowMobiusGrid++;
+		//D
+		Label lblD = new Label("D: ");
+		gridMobius.add(lblD,0,rowMobiusGrid);
+		TextField txtDRe = new TextField(String.valueOf(mandelbrot.D.r));
+		gridMobius.add(txtDRe,1,rowMobiusGrid);
+		Label lblDPlus = new Label(" + ");
+		gridMobius.add(lblDPlus,2,rowMobiusGrid);
+		TextField txtDIm = new TextField(String.valueOf(mandelbrot.D.i));
+		gridMobius.add(txtDIm,3,rowMobiusGrid);
+		Label lblDi = new Label(" i");
+		gridMobius.add(lblDi,4,rowMobiusGrid);
+		rowMobiusGrid++;
+		
+		
+		tpMobius.setContent(gridMobius);
+		parameterVBox.getChildren().add(tpMobius);
 		
 		//Image
 		TitledPane tpImage = new TitledPane();
@@ -194,7 +244,7 @@ public class GUI extends Application{
 		
 		tpImage.setContent(gridImage);
 		parameterVBox.getChildren().add(tpImage);
-		mainGridRow++;
+		
 		
 		//Color
 		TitledPane tpColor = new TitledPane();
@@ -233,12 +283,12 @@ public class GUI extends Application{
 		
 		tpColor.setContent(gridColor);
 		parameterVBox.getChildren().add(tpColor);
-		mainGridRow++;
+		
 		
 		//Generate Button
 		Button btnGenerate = new Button("Generate");
 		parameterVBox.getChildren().add(btnGenerate);
-		mainGridRow++;
+		
 		
 		//Save Button
 		HBox saveHBox = new HBox();
@@ -247,7 +297,7 @@ public class GUI extends Application{
 		TextField txtPath = new TextField("image.png");
 		saveHBox.getChildren().add(txtPath);
 		parameterVBox.getChildren().add(saveHBox);
-		mainGridRow++;
+		
 		
 		//Error text
 		Text lblError = new Text();
@@ -256,8 +306,6 @@ public class GUI extends Application{
 		
 		//Image View
 		VBox pictureVBox = new VBox();
-		/*Label lblStatus = new Label("Done");
-		pictureVBox.getChildren().add(lblStatus);*/
 		pictureVBox.getChildren().add(imageView);
 		
 		//Listeners
@@ -274,7 +322,6 @@ public class GUI extends Application{
 		imageView.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
 			 @Override
 			 public void handle(MouseEvent event) {
-				//System.out.println(event.getX());
 				dragStopX = event.getX();
 				dragStopY = event.getY();
 				if(dragging && dragStartX < dragStopX && dragStartY < dragStopY){
@@ -291,6 +338,23 @@ public class GUI extends Application{
 				dragging = false;
 				event.consume();
 			 }
+		});
+		
+		//Julia set listener
+		btnSetJulia.setOnAction(new EventHandler<ActionEvent>(){
+			@Override
+			public void handle(ActionEvent event){
+				if(mandelbrot.julia){
+					lblError.setText("Error: must focus on mandelbrot set.");
+				}
+				txtJuliaRe.setText(txtCenterRe.getText());
+				txtJuliaIm.setText(txtCenterIm.getText());
+				txtCenterRe.setText("0");
+				txtCenterIm.setText("0");
+				txtWidth.setText("5");		
+				cbJulia.setSelected(true);
+				btnGenerate.fire();
+			}
 		});
 		
 		//Recolor Listener
@@ -331,6 +395,7 @@ public class GUI extends Application{
 				//Julia inputs
 				if(cbJulia.isSelected()){
 					mandelbrot.julia = true;
+					btnSetJulia.setDisable(true);
 					double julia_x = mandelbrot.julia_center.r;
 					double julia_y = mandelbrot.julia_center.i;
 					try{julia_x = Double.parseDouble(txtJuliaRe.getText());}catch(Exception e){
@@ -340,6 +405,45 @@ public class GUI extends Application{
 					mandelbrot.setJulia(julia_x,julia_y);
 				}else{
 					mandelbrot.julia = false;
+					btnSetJulia.setDisable(false);
+				}
+				//Mobius imputs
+				if(cbMobius.isSelected()){
+					mandelbrot.mobius = true;
+					//A
+					double mobiusAr = mandelbrot.A.r;
+					double mobiusAi = mandelbrot.A.i;
+					try{mobiusAr = Double.parseDouble(txtARe.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius A Re\n"; hasError = true;}
+					try{mobiusAi = Double.parseDouble(txtAIm.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius A Im\n"; hasError = true;}
+					mandelbrot.setMobiusA(mobiusAr,mobiusAi);
+					//B
+					double mobiusBr = mandelbrot.B.r;
+					double mobiusBi = mandelbrot.B.i;
+					try{mobiusBr = Double.parseDouble(txtBRe.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius B Re\n"; hasError = true;}
+					try{mobiusBi = Double.parseDouble(txtBIm.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius B Im\n"; hasError = true;}
+					mandelbrot.setMobiusB(mobiusBr,mobiusBi);
+					//C
+					double mobiusCr = mandelbrot.C.r;
+					double mobiusCi = mandelbrot.C.i;
+					try{mobiusCr = Double.parseDouble(txtCRe.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius C Re\n"; hasError = true;}
+					try{mobiusCi = Double.parseDouble(txtCIm.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius C Im\n"; hasError = true;}
+					mandelbrot.setMobiusC(mobiusCr,mobiusCi);
+					//D
+					double mobiusDr = mandelbrot.D.r;
+					double mobiusDi = mandelbrot.D.i;
+					try{mobiusDr = Double.parseDouble(txtDRe.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius D Re\n"; hasError = true;}
+					try{mobiusDi = Double.parseDouble(txtDIm.getText());}catch(Exception e){
+							errorText += "Error parsing Mobius D Im\n"; hasError = true;}
+					mandelbrot.setMobiusD(mobiusDr,mobiusDi);
+				}else{
+					mandelbrot.mobius = false;
 				}
 				//Center inputs
 				double x = mandelbrot.x_center;
@@ -430,21 +534,13 @@ public class GUI extends Application{
 				}
 			}
 		});
-
-		//grid.setGridLinesVisible(true);
 		
-		
+		//Set the Stage
 		ScrollPane leftScrollPane = new ScrollPane();
-		int leftScrollPaneWidth = 250;
-		//leftScrollPane.setPrefWidth(leftScrollPaneWidth);
+		int leftScrollPaneWidth = 380;
 		leftScrollPane.setMinWidth(leftScrollPaneWidth);
 		leftScrollPane.setContent(parameterVBox);
 		HBox mainHBox = new HBox();
-		
-		//ColumnConstraints column = new ColumnConstraints(400);
-		//mainGrid.getColumnConstraints().add(column);
-		//HBox.setHgrow(leftScrollPane, Priority.ALWAYS);
-		
 		mainHBox.getChildren().add(leftScrollPane);
 		ScrollPane rightScrollPane = new ScrollPane();
 		rightScrollPane.setContent(pictureVBox);

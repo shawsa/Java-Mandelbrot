@@ -21,6 +21,12 @@ public class Mandelbrot{
 	int[][] values;
 	
 	boolean julia = false;
+	boolean mobius = false;
+	Complex A = new Complex(1,0);
+	Complex B = new Complex(0,0);
+	Complex C = new Complex(0,0);
+	Complex D = new Complex(1,0);
+	
 	Complex julia_center = new Complex(0,0);
 
 	//dependent parameters
@@ -102,10 +108,12 @@ public class Mandelbrot{
 		y_pixels = y;
 	}
 	
-	public void setJulia(double x, double y){
-		julia_center = new Complex(x,y);
-	}
-
+	public void setJulia(double x, double y){julia_center = new Complex(x,y);}
+	public void setMobiusA(double x, double y){A = new Complex(x,y);}
+	public void setMobiusB(double x, double y){B = new Complex(x,y);}
+	public void setMobiusC(double x, double y){C = new Complex(x,y);}
+	public void setMobiusD(double x, double y){D = new Complex(x,y);}
+	
 	public String[] listSpectrums(){
 		String[] ret = {"prism",
 						"reds",
@@ -201,10 +209,24 @@ public class Mandelbrot{
 	public Complex PixelsToComplex(int x, int y){
 		double re = x_min + x * x_width / (x_pixels-1);
 		double im = y_max - y * y_height / (y_pixels-1);
-		return new Complex(re,im);
+		Complex ret = new Complex(re,im);
+		if(mobius){
+			try{
+				//Find the number that the mobius transform would map to this pixel point
+				ret = (B.sub(D.mult(ret))).divide((C.mult(ret)).sub(A));
+			}catch(ArithmeticException e){
+				ret = new Complex(100000,100000);
+				System.out.println("Divide by Zero");
+			}
+		}
+		return ret;
 	}
 	
 	public int[][] calculateValues(){
+		System.out.println(A.toString());
+		System.out.println(B.toString());
+		System.out.println(C.toString());
+		System.out.println(D.toString());
 		int values[][] = new int[x_pixels][y_pixels];
 		System.out.println("Calculating...");
 		System.out.print("0%\r");
