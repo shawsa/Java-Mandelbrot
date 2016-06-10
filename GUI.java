@@ -44,24 +44,23 @@ public class GUI extends Application{
 	public void start(Stage primaryStage){
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
 		
-		GridPane grid = new GridPane();
-		//VBox parameterVBox = new VBox();
+		//GridPane grid = new GridPane();
+		VBox parameterVBox = new VBox();
+		//parameterVBox.setMinViewportWidth(350);
 		
 		
-		ColumnConstraints column = new ColumnConstraints(80);
+		/*ColumnConstraints column = new ColumnConstraints(80);
 		grid.getColumnConstraints().add(column);
 		column = new ColumnConstraints(80);
 		grid.getColumnConstraints().add(column);
 		column = new ColumnConstraints(200);
 		grid.getColumnConstraints().add(column);
-		
-		
 		grid.setAlignment(Pos.TOP_LEFT);
-		//grid.setHgap(10);
-		//grid.setVgap(gridVgap);
-		int gridVgap = 5;
-		//grid.setPadding(new Insets(5,5,5,5));
+		grid.setHgap(10);
+		grid.setVgap(gridVgap);
+		grid.setPadding(new Insets(5,5,5,5));*/
 		
+		int gridVgap = 5;		
 		int mainGridRow = 0;
 		
 		//Window
@@ -140,12 +139,13 @@ public class GUI extends Application{
 		rowWindowGrid++;
 		
 		tpWindow.setContent(gridWindow);
-		grid.add(tpWindow,0,mainGridRow,3,1);
+		parameterVBox.getChildren().add(tpWindow);
 		mainGridRow++;
 		
 		//Julia
 		TitledPane tpJulia = new TitledPane();
 		tpJulia.setText("Julia");
+		tpJulia.setExpanded(false);
 		GridPane gridJulia = new GridPane();
 		gridJulia.setVgap(gridVgap);
 		int rowJuliaGrid = 0;
@@ -162,7 +162,7 @@ public class GUI extends Application{
 		TextField txtJuliaIm = new TextField();
 		gridJulia.add(txtJuliaIm,1,rowJuliaGrid);
 		tpJulia.setContent(gridJulia);
-		grid.add(tpJulia,0,mainGridRow,3,1);
+		parameterVBox.getChildren().add(tpJulia);
 		mainGridRow++;
 		
 		//Image
@@ -193,7 +193,7 @@ public class GUI extends Application{
 		rowImageGrid++;
 		
 		tpImage.setContent(gridImage);
-		grid.add(tpImage,0,mainGridRow,3,1);
+		parameterVBox.getChildren().add(tpImage);
 		mainGridRow++;
 		
 		//Color
@@ -232,24 +232,26 @@ public class GUI extends Application{
 		rowColorGrid++;
 		
 		tpColor.setContent(gridColor);
-		grid.add(tpColor,0,mainGridRow,3,1);
+		parameterVBox.getChildren().add(tpColor);
 		mainGridRow++;
 		
 		//Generate Button
 		Button btnGenerate = new Button("Generate");
-		grid.add(btnGenerate,0,mainGridRow);
+		parameterVBox.getChildren().add(btnGenerate);
 		mainGridRow++;
 		
 		//Save Button
+		HBox saveHBox = new HBox();
 		Button btnSave = new Button("Save");
-		grid.add(btnSave,0,mainGridRow);
+		saveHBox.getChildren().add(btnSave);
 		TextField txtPath = new TextField("image.png");
-		grid.add(txtPath,1,mainGridRow,2,1);
+		saveHBox.getChildren().add(txtPath);
+		parameterVBox.getChildren().add(saveHBox);
 		mainGridRow++;
 		
 		//Error text
 		Text lblError = new Text();
-		grid.add(lblError,0,mainGridRow,3,1);
+		parameterVBox.getChildren().add(lblError);
 		lblError.setFill(Color.FIREBRICK);
 		
 		//Image View
@@ -433,17 +435,22 @@ public class GUI extends Application{
 		
 		
 		ScrollPane leftScrollPane = new ScrollPane();
-		//leftScrollPane.setMinViewportWidth(400);
-		leftScrollPane.setContent(grid);
-		GridPane mainGrid = new GridPane();
-		column = new ColumnConstraints(400);
-		mainGrid.getColumnConstraints().add(column);
-		mainGrid.add(leftScrollPane,0,0);
+		int leftScrollPaneWidth = 250;
+		//leftScrollPane.setPrefWidth(leftScrollPaneWidth);
+		leftScrollPane.setMinWidth(leftScrollPaneWidth);
+		leftScrollPane.setContent(parameterVBox);
+		HBox mainHBox = new HBox();
+		
+		//ColumnConstraints column = new ColumnConstraints(400);
+		//mainGrid.getColumnConstraints().add(column);
+		//HBox.setHgrow(leftScrollPane, Priority.ALWAYS);
+		
+		mainHBox.getChildren().add(leftScrollPane);
 		ScrollPane rightScrollPane = new ScrollPane();
 		rightScrollPane.setContent(pictureVBox);
-		mainGrid.add(rightScrollPane,1,0);
+		mainHBox.getChildren().add(rightScrollPane);
 		
-		Scene scene = new Scene(mainGrid);
+		Scene scene = new Scene(mainHBox);
 		primaryStage.setScene(scene);
 		
 		primaryStage.show();
