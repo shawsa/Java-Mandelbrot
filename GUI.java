@@ -45,6 +45,7 @@ public class GUI extends Application{
 		primaryStage.setTitle("Mandelbrot/Juila Set Explorer");
 		
 		GridPane grid = new GridPane();
+		//VBox parameterVBox = new VBox();
 		
 		
 		ColumnConstraints column = new ColumnConstraints(80);
@@ -56,173 +57,199 @@ public class GUI extends Application{
 		
 		
 		grid.setAlignment(Pos.TOP_LEFT);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(5,5,5,5));
+		//grid.setHgap(10);
+		//grid.setVgap(gridVgap);
+		int gridVgap = 5;
+		//grid.setPadding(new Insets(5,5,5,5));
 		
-		int row = 0;
-		
-		//Julia
-		CheckBox cbJulia = new CheckBox("Julia");
-		grid.add(cbJulia,0,row,1,1);
-		row++;
-		Label lblJuliaRe = new Label("Re:");
-		grid.add(lblJuliaRe,1,row);
-		TextField txtJuliaRe = new TextField();
-		grid.add(txtJuliaRe,2,row);
-		row++;
-		Label lblJuliaIm = new Label("Im:");
-		grid.add(lblJuliaIm,1,row);
-		TextField txtJuliaIm = new TextField();
-		grid.add(txtJuliaIm,2,row);
-		row++;
-		
-		//Center
-		//x center
-		Label lblCenter = new Label("Center");
-		grid.add(lblCenter,0,row);
-		row++;
-		Label lblCenterRe = new Label("Re:");
-		grid.add(lblCenterRe,1,row);
-		TextField txtCenterRe = new TextField();
-		txtCenterRe.setText(String.valueOf(mandelbrot.x_center));
-		grid.add(txtCenterRe,2,row);
-		row++;
-		//y center
-		Label lblCenterIm = new Label("Im:");
-		grid.add(lblCenterIm,1,row);
-		TextField txtCenterIm = new TextField();
-		txtCenterIm.setText(String.valueOf(mandelbrot.y_center));
-		grid.add(txtCenterIm,2,row);
-		row++;
-		
-		//Aspect checkbox
-		CheckBox cbAspect = new CheckBox("Aspect (overrides y height and y pixels)");
-		grid.add(cbAspect,0,row,3,1);
-		cbAspect.setSelected(true);
-		row++;
-		TextField txtAspectNum = new TextField("16");
-		txtAspectNum.setPrefWidth(5);
-		grid.add(txtAspectNum,1,row);
-		TextField txtAspectDen = new TextField("9");
-		txtAspectDen.setPrefWidth(5);
-		grid.add(txtAspectDen,2,row);
-		row++;
+		int mainGridRow = 0;
 		
 		//Window
-		Label lblWindow = new Label("Window");
-		grid.add(lblWindow,0,row,3,1);
-		row++;
-		Label lblWidth = new Label("Width");
-		grid.add(lblWidth,1,row);
+		//Center
+		TitledPane tpWindow = new TitledPane();
+		tpWindow.setText("Window");
+		GridPane gridWindow = new GridPane();
+		gridWindow.setVgap(gridVgap);
+		int rowWindowGrid = 0;
+		Label lblCenterRe = new Label("Center Re: ");
+		gridWindow.add(lblCenterRe,0,rowWindowGrid);
+		TextField txtCenterRe = new TextField();
+		txtCenterRe.setText(String.valueOf(mandelbrot.x_center));
+		gridWindow.add(txtCenterRe,1,rowWindowGrid);
+		rowWindowGrid++;
+		Label lblCenterIm = new Label("Center Im: ");
+		gridWindow.add(lblCenterIm,0,rowWindowGrid);
+		TextField txtCenterIm = new TextField();
+		txtCenterIm.setText(String.valueOf(mandelbrot.y_center));
+		gridWindow.add(txtCenterIm,1,rowWindowGrid);
+		rowWindowGrid++;
+		//Aspect Ratio
+		HBox aspectHBox = new HBox();
+		CheckBox cbAspect = new CheckBox("Aspect Ratio  ");
+		aspectHBox.getChildren().add(cbAspect);
+		cbAspect.setSelected(true);
+		TextField txtAspectNum = new TextField("16");
+		txtAspectNum.setPrefWidth(40);
+		aspectHBox.getChildren().add(txtAspectNum);
+		Label lblAspectColon = new Label(" : ");
+		aspectHBox.getChildren().add(lblAspectColon);
+		TextField txtAspectDen = new TextField("9");
+		txtAspectDen.setPrefWidth(40);
+		aspectHBox.getChildren().add(txtAspectDen);
+		gridWindow.add(aspectHBox,0,rowWindowGrid,2,1);
+		rowWindowGrid++;
+		Label lblAspectNote = new Label("     (overrides y height and y pixels)");
+		gridWindow.add(lblAspectNote,0,rowWindowGrid,2,1);
+		rowWindowGrid++;
+		//Dimensions
+		Label lblWidth = new Label("Width: ");
+		gridWindow.add(lblWidth,0,rowWindowGrid);
 		TextField txtWidth = new TextField();
-		grid.add(txtWidth,2,row);
+		gridWindow.add(txtWidth,1,rowWindowGrid);
 		txtWidth.setText(String.valueOf(mandelbrot.x_width));
-		row++;
-		Label lblHeight = new Label("Height");
-		grid.add(lblHeight,1,row);
+		rowWindowGrid++;
+		Label lblHeight = new Label("Height: ");
+		gridWindow.add(lblHeight,0,rowWindowGrid);
 		TextField txtHeight = new TextField();
-		grid.add(txtHeight,2,row);
+		gridWindow.add(txtHeight,1,rowWindowGrid);
 		txtHeight.setText(String.valueOf(mandelbrot.y_height));
-		row++;
-		Label lblXmin = new Label("x-min");
-		grid.add(lblXmin,1,row);
+		rowWindowGrid++;
+		Label lblXmin = new Label("x-min: ");
+		gridWindow.add(lblXmin,0,rowWindowGrid);
 		Label lblXminVal = new Label();
-		grid.add(lblXminVal,2,row);
+		gridWindow.add(lblXminVal,1,rowWindowGrid);
 		lblXminVal.setText(String.valueOf(mandelbrot.x_min));
-		row++;
-		Label lblXmax = new Label("x-max");
-		grid.add(lblXmax,1,row);
+		rowWindowGrid++;
+		Label lblXmax = new Label("x-max: ");
+		gridWindow.add(lblXmax,0,rowWindowGrid);
 		Label lblXmaxVal = new Label();
-		grid.add(lblXmaxVal,2,row);
+		gridWindow.add(lblXmaxVal,1,rowWindowGrid);
 		lblXmaxVal.setText(String.valueOf(mandelbrot.x_max));
-		row++;
-		Label lblYmin = new Label("y-min");
-		grid.add(lblYmin,1,row);
+		rowWindowGrid++;
+		Label lblYmin = new Label("y-min: ");
+		gridWindow.add(lblYmin,0,rowWindowGrid);
 		Label lblYminVal = new Label();
-		grid.add(lblYminVal,2,row);
+		gridWindow.add(lblYminVal,1,rowWindowGrid);
 		lblYminVal.setText(String.valueOf(mandelbrot.y_min));
-		row++;
-		Label lblYmax = new Label("y-max");
-		grid.add(lblYmax,1,row);
+		rowWindowGrid++;
+		Label lblYmax = new Label("y-max: ");
+		gridWindow.add(lblYmax,0,rowWindowGrid);
 		Label lblYmaxVal = new Label();
-		grid.add(lblYmaxVal,2,row);
+		gridWindow.add(lblYmaxVal,1,rowWindowGrid);
 		lblYmaxVal.setText(String.valueOf(mandelbrot.y_max));
-		row++;
+		rowWindowGrid++;
+		
+		tpWindow.setContent(gridWindow);
+		grid.add(tpWindow,0,mainGridRow,3,1);
+		mainGridRow++;
+		
+		//Julia
+		TitledPane tpJulia = new TitledPane();
+		tpJulia.setText("Julia");
+		GridPane gridJulia = new GridPane();
+		gridJulia.setVgap(gridVgap);
+		int rowJuliaGrid = 0;
+		CheckBox cbJulia = new CheckBox("Julia");
+		gridJulia.add(cbJulia,0,rowJuliaGrid,2,1);
+		rowJuliaGrid++;
+		Label lblJuliaRe = new Label("Re: ");
+		gridJulia.add(lblJuliaRe,0,rowJuliaGrid);
+		TextField txtJuliaRe = new TextField();
+		gridJulia.add(txtJuliaRe,1,rowJuliaGrid);
+		rowJuliaGrid++;
+		Label lblJuliaIm = new Label("Im: ");
+		gridJulia.add(lblJuliaIm,0,rowJuliaGrid);
+		TextField txtJuliaIm = new TextField();
+		gridJulia.add(txtJuliaIm,1,rowJuliaGrid);
+		tpJulia.setContent(gridJulia);
+		grid.add(tpJulia,0,mainGridRow,3,1);
+		mainGridRow++;
 		
 		//Image
+		TitledPane tpImage = new TitledPane();
+		tpImage.setText("Image");
+		GridPane gridImage = new GridPane();
+		gridImage.setVgap(gridVgap);
+		int rowImageGrid = 0;
 		//Pixels
-		Label lblImage = new Label("Image");
-		grid.add(lblImage,0,row);
-		row++;
-		Label lblXpixels = new Label("x pixels");
-		grid.add(lblXpixels,1,row);
+		Label lblXpixels = new Label("x pixels: ");
+		gridImage.add(lblXpixels,0,rowImageGrid);
 		TextField txtXpixels = new TextField();
-		grid.add(txtXpixels,2,row);
+		gridImage.add(txtXpixels,1,rowImageGrid);
 		txtXpixels.setText(String.valueOf(mandelbrot.x_pixels));
-		row++;
-		Label lblYpixels = new Label("y pixels");
-		grid.add(lblYpixels,1,row);
+		rowImageGrid++;
+		Label lblYpixels = new Label("y pixels: ");
+		gridImage.add(lblYpixels,0,rowImageGrid);
 		TextField txtYpixels = new TextField();
-		grid.add(txtYpixels,2,row);
+		gridImage.add(txtYpixels,1,rowImageGrid);
 		txtYpixels.setText(String.valueOf(mandelbrot.y_pixels));
-		row++;
+		rowImageGrid++;
 		//Iteration
-		Label lblIterationLimit = new Label("iteration limit:");
-		grid.add(lblIterationLimit,1,row);
+		Label lblIterationLimit = new Label("iteration limit: ");
+		gridImage.add(lblIterationLimit,0,rowImageGrid);
 		TextField txtIterationLimit = new TextField();
-		grid.add(txtIterationLimit,2,row);
+		gridImage.add(txtIterationLimit,1,rowImageGrid);
 		txtIterationLimit.setText(String.valueOf(mandelbrot.iteration_limit));
-		row++;
+		rowImageGrid++;
+		
+		tpImage.setContent(gridImage);
+		grid.add(tpImage,0,mainGridRow,3,1);
+		mainGridRow++;
 		
 		//Color
-		Label lblColor = new Label("Coloring");
-		grid.add(lblColor,0,row,3,1);
-		row++;
+		TitledPane tpColor = new TitledPane();
+		tpColor.setText("Coloring");
+		GridPane gridColor = new GridPane();
+		gridColor.setVgap(gridVgap);
+		int rowColorGrid = 0;
 		
-		Label lblIterationColorStart = new Label("color start");
-		grid.add(lblIterationColorStart,1,row);
+		Label lblIterationColorStart = new Label("Color Start: ");
+		gridColor.add(lblIterationColorStart,0,rowColorGrid);
 		TextField txtColorStart = new TextField("0");
-		grid.add(txtColorStart,2,row);
-		row++;
+		gridColor.add(txtColorStart,1,rowColorGrid);
+		rowColorGrid++;
 		
-		Label lblPallet = new Label("pallet");
-		grid.add(lblPallet,1,row);
+		Label lblPallet = new Label("Pallet: ");
+		gridColor.add(lblPallet,0,rowColorGrid);
 		ObservableList<String> spectrumList = FXCollections.observableArrayList(mandelbrot.listSpectrums());
 		ComboBox<String> cbxPallet = new ComboBox<>(spectrumList);
-		grid.add(cbxPallet,2,row);
+		gridColor.add(cbxPallet,1,rowColorGrid);
 		cbxPallet.setValue(mandelbrot.listSpectrums()[0]);
-		row++;
+		rowColorGrid++;
 		
 		
-		Label lblColorScale = new Label("color scaling");
-		grid.add(lblColorScale,1,row);
+		Label lblColorScale = new Label("Pallet Scaling: ");
+		gridColor.add(lblColorScale,0,rowColorGrid);
 		ObservableList<String> colorScaleOptions = FXCollections.observableArrayList(mandelbrot.listScales());
 		ComboBox<String> cbxColorScale = new ComboBox<>(colorScaleOptions);
-		grid.add(cbxColorScale,2,row);
+		gridColor.add(cbxColorScale,1,rowColorGrid);
 		cbxColorScale.setValue(mandelbrot.listScales()[0]);
-		row++;
+		rowColorGrid++;
 		
 		//Recolor Button
 		Button btnRecolor = new Button("Recolor");
-		grid.add(btnRecolor,1,row);
-		row++;
+		gridColor.add(btnRecolor,0,rowColorGrid);
+		rowColorGrid++;
+		
+		tpColor.setContent(gridColor);
+		grid.add(tpColor,0,mainGridRow,3,1);
+		mainGridRow++;
 		
 		//Generate Button
 		Button btnGenerate = new Button("Generate");
-		grid.add(btnGenerate,0,row);
-		row++;
+		grid.add(btnGenerate,0,mainGridRow);
+		mainGridRow++;
 		
 		//Save Button
 		Button btnSave = new Button("Save");
-		grid.add(btnSave,0,row);
+		grid.add(btnSave,0,mainGridRow);
 		TextField txtPath = new TextField("image.png");
-		grid.add(txtPath,1,row,2,1);
-		row++;
+		grid.add(txtPath,1,mainGridRow,2,1);
+		mainGridRow++;
 		
 		//Error text
 		Text lblError = new Text();
-		grid.add(lblError,0,row,3,1);
+		grid.add(lblError,0,mainGridRow,3,1);
 		lblError.setFill(Color.FIREBRICK);
 		
 		//Image View
