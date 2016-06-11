@@ -223,10 +223,6 @@ public class Mandelbrot{
 	}
 	
 	public int[][] calculateValues(){
-		System.out.println(A.toString());
-		System.out.println(B.toString());
-		System.out.println(C.toString());
-		System.out.println(D.toString());
 		int values[][] = new int[x_pixels][y_pixels];
 		System.out.println("Calculating...");
 		System.out.print("0%\r");
@@ -268,21 +264,6 @@ public class Mandelbrot{
 		//Last color
 		colors[colorCount-1] = Color.rgb(Spectrum[Spectrum.length-1][0], Spectrum[Spectrum.length-1][1],
 				Spectrum[Spectrum.length-1][2]);
-		/*
-			Originally the iteration_limit was recalculated so that their was an equal number of
-			iterations assigned to each color gradient and so that each end point of the gradient
-			was included. This meant that the iteration limit was increased to a multiple of one
-			less than the number of colors in the spectrum (the number of gradients between colors)
-			plus one for the end point of the last gradient, plus one again for the set color.
-			
-			With that method the iteration_limit could change each time a spectrum with a different
-			number of colors was applied. It is now a priorety to keep the iteration limit the same.
-			We will instead sacrifice the criterion that each end point color must be hit. Since
-			we are capable of using iteration limits that are significantly larger than the number
-			of color endpoints in the spectrum it is the case that some itteration will come
-			sufficiently close to each color endpoint.
-		*/
-		
 		switch(scale){
 			case "logarithmic":
 				for(int i=0; i<colorCount; i++){

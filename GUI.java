@@ -262,18 +262,18 @@ public class GUI extends Application{
 		Label lblPallet = new Label("Pallet: ");
 		gridColor.add(lblPallet,0,rowColorGrid);
 		ObservableList<String> spectrumList = FXCollections.observableArrayList(mandelbrot.listSpectrums());
-		ComboBox<String> cbxPallet = new ComboBox<>(spectrumList);
-		gridColor.add(cbxPallet,1,rowColorGrid);
-		cbxPallet.setValue(mandelbrot.listSpectrums()[0]);
+		ComboBox<String> cbPallet = new ComboBox<>(spectrumList);
+		gridColor.add(cbPallet,1,rowColorGrid);
+		cbPallet.setValue(mandelbrot.listSpectrums()[0]);
 		rowColorGrid++;
 		
 		
 		Label lblColorScale = new Label("Pallet Scaling: ");
 		gridColor.add(lblColorScale,0,rowColorGrid);
 		ObservableList<String> colorScaleOptions = FXCollections.observableArrayList(mandelbrot.listScales());
-		ComboBox<String> cbxColorScale = new ComboBox<>(colorScaleOptions);
-		gridColor.add(cbxColorScale,1,rowColorGrid);
-		cbxColorScale.setValue(mandelbrot.listScales()[0]);
+		ComboBox<String> cbColorScale = new ComboBox<>(colorScaleOptions);
+		gridColor.add(cbColorScale,1,rowColorGrid);
+		cbColorScale.setValue(mandelbrot.listScales()[0]);
 		rowColorGrid++;
 		
 		//Recolor Button
@@ -291,13 +291,36 @@ public class GUI extends Application{
 		
 		
 		//Save Button
-		HBox saveHBox = new HBox();
-		Button btnSave = new Button("Save");
-		saveHBox.getChildren().add(btnSave);
-		TextField txtPath = new TextField("image.png");
-		saveHBox.getChildren().add(txtPath);
-		parameterVBox.getChildren().add(saveHBox);
+		TitledPane tpSave = new TitledPane();
+		tpSave.setText("Save Image");
+		tpSave.setExpanded(false);
+		GridPane gridSave = new GridPane();
+		gridSave.setVgap(gridVgap);
+		int rowSaveGrid = 0;
 		
+		Label lblPath = new Label("Folder: ");
+		gridSave.add(lblPath,0,rowSaveGrid);
+		TextField txtPath = new TextField(System.getProperty("user.home") + "\\Pictures");
+		gridSave.add(txtPath,1,rowSaveGrid);
+		rowSaveGrid++;
+		Label lblFileName = new Label("File");
+		gridSave.add(lblFileName,0,rowSaveGrid);
+		TextField txtFilename = new TextField("image");
+		gridSave.add(txtFilename,1,rowSaveGrid);
+		rowSaveGrid++;
+		Label lblFileType = new Label("File Type: ");
+		gridSave.add(lblFileType,0,rowSaveGrid);
+		ObservableList<String> fileTypeOptions = FXCollections.observableArrayList("PNG",/*"JPG",*/"GIF");
+		ComboBox<String> cbFileType = new ComboBox<>(fileTypeOptions);
+		cbFileType.setValue("PNG");
+		gridSave.add(cbFileType,1,rowSaveGrid);
+		rowSaveGrid++;
+		Button btnSave = new Button("Save");
+		gridSave.add(btnSave,0,rowSaveGrid,2,1);
+		rowSaveGrid++;
+
+		tpSave.setContent(gridSave);
+		parameterVBox.getChildren().add(tpSave);
 		
 		//Error text
 		Text lblError = new Text();
@@ -374,13 +397,13 @@ public class GUI extends Application{
 					mandelbrot.iteration_color_start = iteration_color_start;
 				}
 				String color = "reds";
-				color = cbxPallet.getValue();
+				color = cbPallet.getValue();
 				try{mandelbrot.setSpectrum(color);}catch(Exception e){
 					errorText += "Error parsing pallet.\n"; hasError = true;}
 				if(hasError){
 					lblError.setText(errorText);
 				}else{
-					imageView.setImage(mandelbrot.colorImage(cbxColorScale.getValue().toString()));
+					imageView.setImage(mandelbrot.colorImage(cbColorScale.getValue().toString()));
 				}
 			}
 		});
@@ -526,9 +549,9 @@ public class GUI extends Application{
 			@Override
 			public void handle(ActionEvent event){
 				BufferedImage img = SwingFXUtils.fromFXImage(imageView.getImage(), null);
-				File f = new File(txtPath.getText());
+				File f = new File(txtPath.getText()+"\\"+txtFilename.getText()+"."+cbFileType.getValue());
 				try{
-					ImageIO.write(img, "PNG", f);
+					ImageIO.write(img, cbFileType.getValue(), f);
 				}catch(Exception e){
 					lblError.setText("Failed to write file.");
 				}
