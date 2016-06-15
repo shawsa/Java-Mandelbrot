@@ -329,6 +329,9 @@ public class GUI extends Application{
 		
 		//Image View
 		VBox pictureVBox = new VBox();
+		//Label lblStatus = new Label();
+		//lblStatus.textProperty().bind(mandelbrot.status);
+		//pictureVBox.getChildren().add(lblStatus);
 		pictureVBox.getChildren().add(imageView);
 		
 		//Listeners
@@ -539,8 +542,16 @@ public class GUI extends Application{
 				if(hasError){
 					lblError.setText(errorText);
 				}else{
-					mandelbrot.calculateValues();
-					btnRecolor.fire();
+					Task<Void> task = new Task<Void>() {
+						@Override protected Void call() throws Exception {
+							mandelbrot.calculateValues();
+							btnRecolor.fire();
+							return null;
+						}
+					};
+					new Thread(task).start();
+					/*mandelbrot.calculateValues();
+					btnRecolor.fire();*/
 				}
 			}
 		});

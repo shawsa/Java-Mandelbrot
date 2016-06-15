@@ -1,4 +1,6 @@
 import java.awt.image.BufferedImage;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.*;
 import javafx.scene.paint.Color;
@@ -7,7 +9,7 @@ import javax.imageio.ImageIO;
 import java.lang.Math;
 public class Mandelbrot{
 	//default independent parameters
-	String status = "";
+	StringProperty status = new SimpleStringProperty();
 	double x_center = -.25;
 	double y_center = 0;
 	double x_width = 4;
@@ -40,10 +42,6 @@ public class Mandelbrot{
 		y_pixels = 1080/2;
 		values = new int[x_pixels][y_pixels];
 		recalculateWindow();
-	}
-	
-	public String getStatus(){
-		return this.status;
 	}
 	
 	//Sets window ranges from center and width/height		
@@ -224,7 +222,7 @@ public class Mandelbrot{
 	
 	public int[][] calculateValues(){
 		int values[][] = new int[x_pixels][y_pixels];
-		System.out.println("Calculating...");
+		/*System.out.println("Calculating...");
 		System.out.print("0%\r");
 		this.status = "0%";
 		if(!julia){
@@ -244,7 +242,50 @@ public class Mandelbrot{
 			}
 		}
 		System.out.println("100%");
-		this.status = "100%";
+		this.status = "100%";*/
+		
+		int cores = java.lang.Runtime.getRuntime().availableProcessors();
+		int colPerCore = x_pixels/cores;
+		CalcThread[] calcs = new CalcThread[cores];
+		Thread[] threads = new Thread[cores];
+		for(int i=0; i<cores; i++){
+			int xStart = i*colPerCore;
+			int xStop = (i+1)*colPerCore;
+			if(i==cores-1){xStop = x_pixels;}
+			calcs[i] = new CalcThread(x_min,x_width,y_max,y_height,limit_square,
+					iteration_limit,x_pixels,y_pixels,xStart,xStop,
+					mobius,julia,A,B,C,D,julia_center);
+			threads[i] = new Thread(calcs[i]);
+			threads[i].start();
+		}
+		
+		int complete = 0;
+		while(complete < x_pixels){
+			complete = 0;
+			for(int core=0; core<cores; core++){
+					complete += calcs[core].getComplete();
+			}
+			System.out.print(100*complete/x_pixels + "%\r");
+			//status.set("Calculating " + (100*complete/x_pixels) + "%");
+			try{Thread.sleep(100);}catch(Exception e){}
+		}
+		System.out.println("100%");
+		for(int i=0; i<cores; i++){
+			try{
+				threads[i].join();
+			}catch(Exception e){
+				System.out.println("Failure in thread " + i + ".");
+			}
+		}
+		for(int core=0; core<cores; core++){
+			int[][]values1 = calcs[core].getValues();
+			for(int i=0; i<values1.length; i++){
+				for(int j=0; j<y_pixels; j++){
+					values[i+core*colPerCore][j] = values1[i][j];
+				}
+			}
+		}
+		
 		this.values = values;
 		return values;
 	}
@@ -511,6 +552,102 @@ public class Mandelbrot{
 			ImageIO.write(img, "PNG", f);
 		}catch(Exception e){
 			System.out.println("Failed to write file.");
+		}
+	}
+}
+
+class CalcThread implements Runnable{
+	private double xMin, xWidth, yMax, yHeight, limitSquare;
+	private int xPixels, yPixels, xStart, xStop, iterationLimit;
+	private Complex A, B, C, D, juliaCenter;
+	protected boolean mobius, julia;
+	int[][] values;
+	int complete;
+	
+	
+	public CalcThread(double xMin, double xWidth, double yMax, double yHeight,
+						double limitSquare, int iterationLimit,
+						int xPixels, int yPixels, int xStart, int xStop,
+						boolean mobius, boolean julia,
+						Complex A, Complex B, Complex C, Complex D, Complex juliaCenter)
+	{
+		this.xMin = xMin;
+		this.xWidth = xWidth;
+		this.yMax = yMax;
+		this.yHeight = yHeight;
+		this.limitSquare = limitSquare;
+		this.iterationLimit = iterationLimit;
+		this.xPixels = xPixels;
+		this.yPixels = yPixels;
+		this.xStart = xStart;
+		this.xStop = xStop;
+		this.mobius = mobius;
+		this.julia = julia;
+		this.A = A;
+		this.B = B;
+		this.C = C;
+		this.D = D;
+		this.juliaCenter = juliaCenter;
+		this.values = new int[xStop-xStart][yPixels];
+		this.complete = 0;
+	}
+	
+	public int[][] getValues(){return values;}
+	
+	public int getComplete(){return complete;}
+	
+	private Complex PixelsToComplex(int x, int y){
+		double re = xMin + x * xWidth / (xPixels-1);
+		double im = yMax - y * yHeight / (yPixels-1);
+		Complex ret = new Complex(re,im);
+		if(mobius){
+			try{
+				//Find the number that the mobius transform would map to this pixel point
+				ret = (B.sub(D.mult(ret))).divide((C.mult(ret)).sub(A));
+			}catch(ArithmeticException e){
+				ret = new Complex(100000,100000);
+				System.out.println("Divide by Zero");
+			}
+		}
+		return ret;
+	}
+	
+	private int Converge(Complex z){
+		int i = 0;
+		Complex w = z;
+		while(w.ModSquare()<limitSquare && i< iterationLimit){
+			i++;
+			w = w.Square().Add(z);
+		}
+		return i;
+	}
+	
+	private int JuliaConverge(Complex z){
+		int i = 0;
+		Complex w = z;
+		while(w.ModSquare()<limitSquare && i< iterationLimit){
+			i++;
+			w = w.Square().Add(juliaCenter);
+		}
+		return i;
+	}
+	
+	
+	public void run(){
+		if(!julia){
+			for(int x=xStart; x<xStop; x++){
+				for(int y=0; y<yPixels; y++){
+					values[x-xStart][y] = Converge(PixelsToComplex(x,y));
+				}
+				complete = x+1-xStart;
+			}
+		}else{
+			for(int x=xStart; x<xStop; x++){
+				for(int y=0; y<yPixels; y++){
+					values[x-xStart][y] = JuliaConverge(PixelsToComplex(x,y));
+				}
+				complete = x+1-xStart;
+			}
 		}
 	}
 }
